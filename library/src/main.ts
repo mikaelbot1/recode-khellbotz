@@ -1,8 +1,14 @@
-import { Eval } from "./eval";
+import { Eval,  Execute } from "./eval";
 import { } from "./test";
-import { Menu } from "./menu";
+import { Menu, Owner } from "./menu";
+import { Sticker } from "./sticker";
+import { Tomp3 } from "./converter";
 
 export function onPattern (): void {
 	Eval
 	Menu
+	Sticker
+	Execute
+	Owner
+	Tomp3
 }

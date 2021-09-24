@@ -62,6 +62,7 @@ export var Menu = globalThis.Client.on("menu", async (data: HandlingData, Cli: C
 	}
 	let Menu: string = ""
 	for (let menu of hasil) {
+		menu.menu = menu.menu.filter((res1, res2) => menu.menu.indexOf(res1) == res2)
 		Menu += `\n\n            *MENU ${menu.tag.toUpperCase()}*\n\n`
 		Menu += "*ℒ⃝🕊️ •* " + menu.menu.join("\n*ℒ⃝🕊️ •* ")
 	}

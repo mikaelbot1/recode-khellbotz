@@ -45,6 +45,7 @@ export class CommandHandler {
 					let _command: string = event.isButton ? getIdButton ?? "" : command.startsWith(getPrefix) ? command.replace(getPrefix, "") : command
 					const isCmd: boolean = this.getCmd(event.isButton ? getIdButton ?? "" : command, event.command, getPrefix)
 					if (!isCmd) continue
+					event.simple = (event.simple == undefined) ? false : event.simple
 					event.antispam = (event.antispam == undefined) ? true : event.antispam
 					event.isBlockir = (event.isBlockir == undefined) ? true : event.isBlockir
 					if (event.isOwner && !isOwner) return
@@ -61,7 +62,8 @@ export class CommandHandler {
 					if (event.isAdmins && !(await groupMetadata()).isGroupAdmins) return await this.res.reply(from, "*「❗」*  Mohon Maaf kak, Perintah ini dapat digunakan khusus untuk admin group saja", id)
 					if (event.isBotAdmins && !(await groupMetadata()).isBotAdmins) return await this.res.reply(from, "*「❗」* Mohon Maaf Kak, Perintah ini dapat di gunakan jika bot menjadi admin group", id)
 					try {
-						if (event.antispam && !isOwner) waitSpam.add(sender as string) 
+						if (event.antispam && !isOwner) waitSpam.add(sender as string);
+						if (event.loading && !event.simple) await this.res.reply(from, `*⌛* Mohon tunggu sebentar bot sedang melaksanakan perintah`, id)
 						return void  (await event.callback(data, res)) 
 					} catch (err) {
 						if (event.antispam && !!rejectSpam.has(sender as string)) rejectSpam.delete(sender as string)

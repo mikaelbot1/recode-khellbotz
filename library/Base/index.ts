@@ -8,6 +8,7 @@ class Connected {
 	public async sendRespon () {
 		this.Handler.BeforeConnect()
 		this.Handler.AfterConnect()
+		this.Handler.DetectorConnect()
 	}
 }
 new  Connected().sendRespon()

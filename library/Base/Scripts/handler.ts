@@ -3,7 +3,8 @@ import { WAChatUpdate,  WAContact, WAGroupMetadata, WAConnection, WAMessage, WAG
 import moment from "moment-timezone";
 import { getBuffer } from "../../functions/function"
 import * as fs from "fs";
-import { GroupMetadata, HandlingData } from "../../typings"
+import { GroupMetadata, HandlingData, Formatter } from "../../typings";
+import CreateApi from "../../routers/api/index";
 
 export class HandlerData  {
 	public getRespon (chats: WAChatUpdate, client: WAConnection): HandlingData | undefined {
@@ -33,6 +34,7 @@ export class HandlerData  {
         const isQuotedVideo: boolean = typeQuoted === "videoMessage";
         const isQuotedAudio: boolean = typeQuoted === 'audioMessage';
         const isQuotedDokumen: boolean = typeQuoted === 'documentMessage';
+		const isQuotedStickerGif: boolean = media?.message?.stickerMessage?.isAnimated || false
 		const id: proto.WebMessageInfo = mess as proto.WebMessageInfo
 		const groupMetadata = async (): Promise <GroupMetadata> => {
 			const groupMetadata: WAGroupMetadata | null = isGroupMsg ? await client.groupMetadata(from) : null;
@@ -65,6 +67,7 @@ export class HandlerData  {
 			let respon: proto.WebMessageInfo = await client.loadMessage(from as string, id ?? quotedMsg?.stanzaId as string)
 			return respon
 		}
-		return { ...validation.Validations(mess as WAMessage), sender,contacts, content,  pushname, fromMe, isBot, botNumber,  ownerNumber, sendOwner, isOwner, isMedia, isGambar,  isVideo, isAudio, isSticker, Jam, isQuotedSticker, isQuotedImage,  isQuotedVideo, isQuotedAudio,  isQuotedDokumen, groupMetadata, ToBuffer,  getQuotedMsg, id } as HandlingData
+		const createAPI: CreateApi = new CreateApi()
+		return { ...validation.Validations(mess as WAMessage), sender,contacts, content,  pushname, fromMe, isBot, botNumber,  ownerNumber, sendOwner, isOwner, isMedia, isGambar,  isVideo, isAudio, isSticker, Jam, isQuotedSticker, isQuotedImage,  isQuotedVideo, isQuotedAudio,  isQuotedDokumen, groupMetadata, ToBuffer,  getQuotedMsg, id, isQuotedStickerGif, createAPI } as HandlingData
 	}
 }

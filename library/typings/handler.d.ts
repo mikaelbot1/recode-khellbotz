@@ -1,4 +1,5 @@
 import { proto, WAMessage,  WAGroupMetadata, WAGroupParticipant, WAContact } from "@adiwajshing/baileys";
+import CreateApi from "../routers/api/index";
 
 export declare class HandlingData extends Validator {
 	contacts: string | WAContact | any;
@@ -27,6 +28,8 @@ export declare class HandlingData extends Validator {
 	groupMetadata: () => Promise <GroupMetadata>;
 	ToBuffer: (getData?: string | Buffer) => Promise <Buffer>;
 	getQuotedMsg: (id?: string) => Promise <proto.WebMessageInfo>;
+	isQuotedStickerGif: boolean;
+	createAPI: CreateApi;
 }
 export declare class Validator {
 	message: proto.IFutureProofMessage;
@@ -43,7 +46,7 @@ export declare class Validator {
 	command: string;
 	mentioned: string[] | undefined[];
 	FileSha: string | null | undefined;
-	Filesize: number | Long | undefined | null;
+	Filesize: number  | undefined | null;
 	getIdButton: string | null | undefined;
 	fileInfo: () => FileInformation;
 	chats: WAMessage;
@@ -55,7 +58,7 @@ export interface FileInformation {
 	type: string | null 
 }
 export interface FileSizeData {
-	Length: number | null | Long;
+	Length: number | null;
 	size: null | string;
 }
 export declare interface GroupMetadata {
@@ -96,6 +99,9 @@ export declare interface getCommand {
 	delaySpam?: number;
 	autoblock?: boolean;
 	isButton?: boolean;
+	loading?: boolean;
+	skipMenu?: boolean;
+	simple?: boolean;
 }
 export declare class EventEmitter implements getCommand {
 	className: string;
@@ -123,4 +129,7 @@ export declare class EventEmitter implements getCommand {
 	isQuerry?: boolean;
 	isMedia?: boolean;
 	isButton?: boolean;
+	loading?: boolean;
+	skipMenu?: boolean;
+	simple?: boolean;
 }

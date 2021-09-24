@@ -2,7 +2,7 @@ import { WAConnection, WAOpenResult, Browsers } from '@adiwajshing/baileys';
 import chalk from "chalk";
 import * as fs from "fs";
 import axios, { AxiosResponse } from "axios";
-import { getClientVersion } from "../../typings"
+import { getClientVersion } from "../../typings";
 
 
 const Path: string = "./library/routers/account/session_bot.json";

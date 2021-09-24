@@ -5,10 +5,19 @@ export declare class FunctionMethod {
 	Tunggu: (ms: number) => Promise <unknown>;
 	RandomName: (jumlah: number) => string;
 	Runtime: (second: number) => string
-	Ucapan: () => string
+	Ucapan: () => string;
+	autoPath: (ext?: string)  => string
+	createExif (Path: string, pakage?: string, author?: string): Promise <string>
+	UserAgent (): string;
+	RandomArray (array: any[]): any[]
 }
 export declare class ToolsMethod {
-	Exec: (code: string) => Promise <string>
+	Exec: (code: string) => Promise <string>;
+	convertToWebp: (input: string) => Promise <string>;
+	createWmSticker: (input: string, exif?: string) => Promise <string>;
+	stickerWhatsappFormatterWithCropped: (media: Buffer | string, pakage?: string, author?: string) => Promise <Buffer>;
+	WebpToGif: (input: string) => Promise <string>
+	WebpToMp4: (input: string) => Promise <string>
 }
 export declare class Formatter {
 	LogLogin: () => void;
@@ -18,5 +27,14 @@ export declare class Formatter {
 	RandomName: (jumlah: number) => string;
 	Exec: (code: string) => Promise <string>
 	Runtime: (second: number) => string
-	Ucapan: () => string
+	Ucapan: () => string;
+	autoPath: (ext?: string)  => string
+	createExif (Path: string, pakage?: string, author?: string): Promise <string>;
+	convertToWebp: (input: string) => Promise <string>;
+	createWmSticker: (input: string, exif?: string) => Promise <string>;
+	stickerWhatsappFormatterWithCropped: (media: Buffer | string, pakage?: string, author?: string) => Promise <Buffer>;
+	WebpToGif: (input: string) => Promise <string>
+	WebpToMp4: (input: string) => Promise <string>
+	UserAgent (): string;
+	RandomArray (array: any[]): any[]
 }

@@ -1,5 +1,6 @@
 import { CommandHandler } from "../Base/Scripts";
 
 declare global {
-	var Client: CommandHandler
+	var Client: CommandHandler;
+	var Publik: boolean;
 }
