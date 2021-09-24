@@ -52,26 +52,9 @@ npm start
 
 ---
 
-### FOR TERMUX USER
+### GA SUPPORT TERMUX LAGI PAKE SHARP
 
-```bash
-apt update && apt upgrade
-apt install git -y
-apt install nodejs -y
-git clone https://github.com/rayyreall/Whatsapp_Bot
-cd Bot-Whatsapp
-npm build
-```
-
-## Run
-
-```bash
-npm start
-```
-
-Notes : I've never tried it on termux so sorry if there's an error
-This is a new base, it's easier than the previous base, maybe I'll focus on updating this base, this base doesn't use mongodb, only uses json,
-this is just a little
+Notes : 
 Still in the process of updating
 ---
 
