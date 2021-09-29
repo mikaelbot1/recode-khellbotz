@@ -41,7 +41,7 @@
 ```bash
 git clone https://github.com/rayyreall/Whatsapp_Bot
 cd Bot-Whatsapp
-npm build
+npm run build
 ```
 
 ## Run
