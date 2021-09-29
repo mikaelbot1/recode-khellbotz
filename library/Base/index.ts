@@ -1,8 +1,9 @@
 import { WAConnection } from '@adiwajshing/baileys';
-import { MainHandler } from "./Scripts"
+import { MainHandler } from "./Scripts";
 
 class Connected {
-	constructor () {}
+	constructor () {
+	}
 	public client: WAConnection = new WAConnection()
 	public Handler: MainHandler = new MainHandler(this.client)
 	public async sendRespon () {

@@ -1,6 +1,9 @@
-import { WAMessage, proto, WAConnection } from '@adiwajshing/baileys';
+import { WAMessage, proto, WAConnection} from '@adiwajshing/baileys';
 import filesize from "filesize";
-import { Validator, FileInformation } from "../../typings"
+import { Validator, FileInformation, IRegister  } from "../../typings";
+import * as fs from "fs";
+
+
 
 export class Validations {
 	public Validations (chats: WAMessage): Validator {
@@ -27,7 +30,6 @@ export class Validations {
 		const mentioned: string[] | undefined[] = message.message?.extendedTextMessage?.contextInfo?.mentionedJid && message.message.extendedTextMessage.contextInfo.mentionedJid.length > 0 ? message.message.extendedTextMessage.contextInfo.mentionedJid : message?.message?.extendedTextMessage?.contextInfo?.quotedMessage && message.message.extendedTextMessage.contextInfo.participant ? [message.message.extendedTextMessage.contextInfo.participant] : [];
         const FileSha: string | null | undefined = message.message?.imageMessage ? message.message.imageMessage.fileSha256?.toString() : message?.message?.videoMessage ? message.message.videoMessage.fileSha256?.toString() : message?.message?.stickerMessage ? message.message.stickerMessage.fileSha256?.toString() : quotedMsg ? quotedMsg.quotedMessage?.imageMessage ? quotedMsg.quotedMessage.imageMessage.fileSha256?.toString() : quotedMsg.quotedMessage?.videoMessage ? quotedMsg.quotedMessage.videoMessage.fileSha256?.toString() : quotedMsg.quotedMessage?.stickerMessage ? quotedMsg.quotedMessage.stickerMessage.fileSha256?.toString() : null : null
         const Filesize: number  | undefined | null | any= media ? media.message ? media.message.audioMessage ? media.message.audioMessage.fileLength : media.message.imageMessage ? media.message.imageMessage.fileLength : media.message.videoMessage ? media.message.videoMessage.fileLength : media.message.documentMessage ? media.message.documentMessage.fileLength : 0 : null : null;
-		const prefix: string = /^[°•π÷×¶∆£¢€¥®™+✓_=|~!?@#$%^&.©^]/gi.test(command) ? (command.match(/^[°•π÷×¶∆£¢€¥®™+✓_=|~!?@#$%^&.©^]/gi) as RegExpMatchArray)[0] : "-"
 		const getBatas = (): FileInformation => {
 			const Format: FileInformation = {
 				durasi: null,
@@ -48,6 +50,6 @@ export class Validations {
 			}
 			return Format
 		}
-		return { message, from, isGroupMsg, type, quotedType, typeQuoted, quotedMsg, bodyQuoted: quotedBody, body, command, media, mentioned,  FileSha, Filesize, fileInfo: getBatas, chats: chats, getIdButton, args, prefix}
+		return { message, from, isGroupMsg, type, quotedType, typeQuoted, quotedMsg, bodyQuoted: quotedBody, body, command, media, mentioned,  FileSha, Filesize, fileInfo: getBatas, chats: chats, getIdButton, args }
 	}
 }

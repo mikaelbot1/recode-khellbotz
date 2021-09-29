@@ -2,8 +2,9 @@ import { WAConnection, MessageType, proto, WAGroupParticipant, compressImage } f
 import {  HandlingData,  Formatter  } from "../../typings";
 import filetype, { FileTypeResult } from "file-type";
 import { RandomName, getUrl, getBuffer } from "../../functions/function";
-import { response } from "../../plugins"
+import { response } from "../../plugins";
 import * as fs from "fs";
+import { Headers } from "got";
 
 export class ClientMessage {
 	constructor (public client: WAConnection, public data: HandlingData) {}
@@ -67,7 +68,56 @@ export class ClientMessage {
 	public async Print (text: string): Promise <proto.WebMessageInfo> {
 		return await this.reply(this.data.from, JSON.stringify(text, null, 4), this.data.id)
 	}
-	public async sendFile (from: string, media: Buffer | string | proto.WebMessageInfo, _settings?: { caption?: string, quoted?: proto.WebMessageInfo, ptt?: boolean, viewOnce?: boolean, withMentions?: boolean, forwardingScore?: number, filename?: string, sendDocs?: boolean}): Promise <proto.WebMessageInfo | void> {
+	public Type = MessageType;
+	public async sendVideo (from: string, media: Buffer | string, _settings?: { caption?: string, quoted?: proto.WebMessageInfo, viewOnce?: boolean, withMentions?: boolean, constumHeaders?: Headers }): Promise <proto.WebMessageInfo> {
+		const ParseMentioned: string[] | undefined = _settings?.withMentions == true ? (String(_settings?.caption).match(/@(0|[0-9]{4,14})/g)?.map((values: string) => values.split("@")[1] + "@s.whatsapp.net")) : []
+		const Reparse: string[] | undefined = _settings?.withMentions == true ? (await (await this.data.groupMetadata()).groupMember)?.map((values: WAGroupParticipant) => values.jid) : []
+		let Mentioned: string[] = [];
+		if (ParseMentioned) {
+			for (let result of ParseMentioned) {
+				Reparse?.filter((value: string) => {
+					if (value === result) Mentioned.push(result)
+				})
+			}
+		}
+		if (Buffer.isBuffer(media)) {
+			return await this.client.sendMessage(from, media, MessageType.video, { caption: _settings?.caption, quoted: _settings?.quoted, viewOnce: _settings?.viewOnce ?? false, contextInfo: { mentionedJid: Mentioned } })
+		} else if (typeof media === "string" && fs.existsSync(media)) {
+			media = fs.readFileSync(media);
+			return await this.client.sendMessage(from, media, MessageType.video, { caption: _settings?.caption, quoted: _settings?.quoted, viewOnce: _settings?.viewOnce ?? false, contextInfo: { mentionedJid: Mentioned } })
+		} else if (typeof media === "string" && getUrl(media)) {
+			let Url: RegExpMatchArray = getUrl(media) as RegExpMatchArray
+			media = await getBuffer(Url[0], _settings?.constumHeaders);
+			return await this.client.sendMessage(from, media, MessageType.video, { caption: _settings?.caption, quoted: _settings?.quoted, viewOnce: _settings?.viewOnce ?? false, contextInfo: { mentionedJid: Mentioned } })
+		} else {
+			return this.reply(from, "Media Not Support")
+		}
+	}
+	public async sendAudio (from: string, media: Buffer | string, _settings?: { caption?: string, quoted?: proto.WebMessageInfo, withMentions?: boolean, costumHeaders?: Headers }): Promise <proto.WebMessageInfo> {
+		const ParseMentioned: string[] | undefined = _settings?.withMentions == true ? (String(_settings?.caption).match(/@(0|[0-9]{4,14})/g)?.map((values: string) => values.split("@")[1] + "@s.whatsapp.net")) : []
+		const Reparse: string[] | undefined = _settings?.withMentions == true ? (await (await this.data.groupMetadata()).groupMember)?.map((values: WAGroupParticipant) => values.jid) : []
+		let Mentioned: string[] = [];
+		if (ParseMentioned) {
+			for (let result of ParseMentioned) {
+				Reparse?.filter((value: string) => {
+					if (value === result) Mentioned.push(result)
+				})
+			}
+		}
+		if (Buffer.isBuffer(media)) {
+			return await this.client.sendMessage(from, media, MessageType.audio, { caption: _settings?.caption, quoted: _settings?.quoted, contextInfo: { mentionedJid: Mentioned } })
+		} else if (typeof media === "string" && fs.existsSync(media)) {
+			media = fs.readFileSync(media);
+			return await this.client.sendMessage(from, media, MessageType.audio, { caption: _settings?.caption, quoted: _settings?.quoted, contextInfo: { mentionedJid: Mentioned } })
+		} else if (typeof media === "string" && getUrl(media)) {
+			let Url: RegExpMatchArray = getUrl(media) as RegExpMatchArray
+			media = await getBuffer(Url[0], _settings?.costumHeaders);
+			return await this.client.sendMessage(from, media, MessageType.audio, { caption: _settings?.caption, quoted: _settings?.quoted,  contextInfo: { mentionedJid: Mentioned } })
+		} else {
+			return this.reply(from, "Media Not Support")
+		}
+	}
+	public async sendFile (from: string, media: Buffer | string | proto.WebMessageInfo, _settings?: { caption?: string, quoted?: proto.WebMessageInfo, ptt?: boolean, viewOnce?: boolean, withMentions?: boolean, forwardingScore?: number, filename?: string, sendDocs?: boolean, autoPreview?: proto.ExternalAdReplyInfo }): Promise <proto.WebMessageInfo | void> {
 		const ParseMentioned: string[] | undefined = _settings?.withMentions == true ? (String(_settings?.caption).match(/@(0|[0-9]{4,14})/g)?.map((values: string) => values.split("@")[1] + "@s.whatsapp.net")) : []
 		const Reparse: string[] | undefined = _settings?.withMentions == true ? (await (await this.data.groupMetadata()).groupMember)?.map((values: WAGroupParticipant) => values.jid) : []
 		let Mentioned: string[] = [];
@@ -83,25 +133,25 @@ export class ClientMessage {
 				const File: FileTypeResult | undefined = await  filetype.fromBuffer(media)
 				switch (_settings?.sendDocs ? "docs" : File?.ext) {
 					case "docs":
-						return await this.client.sendMessage(from, media, MessageType.document, { quoted: _settings?.quoted, mimetype: File?.mime, filename: _settings?.filename ?? "RA BOT" + RandomName(12), contextInfo: { mentionedJid: Mentioned, forwardingScore: _settings?.forwardingScore }})	
+						return await this.client.sendMessage(from, media, MessageType.document, { quoted: _settings?.quoted, mimetype: File?.mime, filename: _settings?.filename ?? "RA BOT" + RandomName(12), contextInfo: { mentionedJid: Mentioned, forwardingScore: _settings?.forwardingScore, externalAdReply: _settings?.autoPreview }})	
 					case "mp4":
-						return await this.client.sendMessage(from, media, MessageType.video, { caption: _settings?.caption, quoted: _settings?.quoted, viewOnce: _settings?.viewOnce ?? false, contextInfo: { mentionedJid: Mentioned, forwardingScore: _settings?.forwardingScore } })
+						return await this.client.sendMessage(from, media, MessageType.video, { caption: _settings?.caption, quoted: _settings?.quoted, viewOnce: _settings?.viewOnce ?? false, contextInfo: { mentionedJid: Mentioned, forwardingScore: _settings?.forwardingScore  } })
 					case "mp3":
-						return await this.client.sendMessage(from, media, MessageType.audio, { quoted: _settings?.quoted, ptt: _settings?.ptt, contextInfo: { mentionedJid: Mentioned, forwardingScore: _settings?.forwardingScore }})
+						return await this.client.sendMessage(from, media, MessageType.audio, { quoted: _settings?.quoted, ptt: _settings?.ptt, contextInfo: { mentionedJid: Mentioned, forwardingScore: _settings?.forwardingScore, externalAdReply: _settings?.autoPreview }})
 					case "webp":
-						return await this.client.sendMessage(from, media, MessageType.sticker, { quoted: _settings?.quoted, contextInfo: { mentionedJid: Mentioned, forwardingScore: _settings?.forwardingScore }})
+						return await this.client.sendMessage(from, media, MessageType.sticker, { quoted: _settings?.quoted, contextInfo: { mentionedJid: Mentioned, forwardingScore: _settings?.forwardingScore, externalAdReply: _settings?.autoPreview }})
 					case "png":
 					case "jpg":
-						return await this.client.sendMessage(from, media, MessageType.image, { caption: _settings?.caption, quoted: _settings?.quoted, viewOnce: _settings?.viewOnce ?? false, contextInfo: { mentionedJid: Mentioned, forwardingScore: _settings?.forwardingScore }, thumbnail: (await (await this.compressGambar(media)).toString()) })
+						return await this.client.sendMessage(from, media, MessageType.image, { caption: _settings?.caption, quoted: _settings?.quoted, viewOnce: _settings?.viewOnce ?? false, contextInfo: { mentionedJid: Mentioned, forwardingScore: _settings?.forwardingScore }, thumbnail: (await (await this.compressGambar(media)) as any) })
 					default:
-						return await this.client.sendMessage(from, media, MessageType.document, { quoted: _settings?.quoted, mimetype: File?.mime, filename: _settings?.filename ?? "RA BOT" + RandomName(12), contextInfo: { mentionedJid: Mentioned, forwardingScore: _settings?.forwardingScore }})	
+						return await this.client.sendMessage(from, media, MessageType.document, { quoted: _settings?.quoted, mimetype: File?.mime || "application/x", filename: _settings?.filename ?? "RA BOT" + RandomName(12), contextInfo: { mentionedJid: Mentioned, forwardingScore: _settings?.forwardingScore }})	
 				}
 			} else if (typeof media === "string" && fs.existsSync(media)) {
 				media = fs.readFileSync(media)
 				const File: FileTypeResult | undefined = await  filetype.fromBuffer(media)
 				switch (_settings?.sendDocs ? "docs" : File?.ext) {
 					case "docs":
-						return await this.client.sendMessage(from, media, MessageType.document, { quoted: _settings?.quoted, mimetype: File?.mime, filename: _settings?.filename ?? "RA BOT" + RandomName(12), contextInfo: { mentionedJid: Mentioned, forwardingScore: _settings?.forwardingScore }})	
+						return await this.client.sendMessage(from, media, MessageType.document, { quoted: _settings?.quoted, mimetype: File?.mime || "application/x", filename: _settings?.filename ?? "RA BOT" + RandomName(12), contextInfo: { mentionedJid: Mentioned, forwardingScore: _settings?.forwardingScore }})	
 					case "mp4":
 						return await this.client.sendMessage(from, media, MessageType.video, { caption: _settings?.caption, quoted: _settings?.quoted, viewOnce: _settings?.viewOnce ?? false, contextInfo: { mentionedJid: Mentioned, forwardingScore: _settings?.forwardingScore } })
 					case "mp3":
@@ -110,7 +160,7 @@ export class ClientMessage {
 						return await this.client.sendMessage(from, media, MessageType.sticker, { quoted: _settings?.quoted, contextInfo: { mentionedJid: Mentioned, forwardingScore: _settings?.forwardingScore }})
 					case "png":
 					case "jpg":
-						return await this.client.sendMessage(from, media, MessageType.image, { caption: _settings?.caption, quoted: _settings?.quoted, viewOnce: _settings?.viewOnce ?? false, contextInfo: { mentionedJid: Mentioned, forwardingScore: _settings?.forwardingScore }, thumbnail: (await (await this.compressGambar(media)).toString()) })
+						return await this.client.sendMessage(from, media, MessageType.image, { caption: _settings?.caption, quoted: _settings?.quoted, viewOnce: _settings?.viewOnce ?? false, contextInfo: { mentionedJid: Mentioned, forwardingScore: _settings?.forwardingScore }, thumbnail: (await (await this.compressGambar(media)) as any) })
 					default:
 						return await this.client.sendMessage(from, media, MessageType.document, { quoted: _settings?.quoted, mimetype: File?.mime, filename: _settings?.filename ?? "RA BOT" + RandomName(12), contextInfo: { mentionedJid: Mentioned, forwardingScore: _settings?.forwardingScore }})	
 				}
@@ -120,7 +170,7 @@ export class ClientMessage {
 				const File: FileTypeResult | undefined = await  filetype.fromBuffer(media)
 				switch (_settings?.sendDocs == true ? "docs" : File?.ext) {
 					case "docs":
-						return await this.client.sendMessage(from, media, MessageType.document, { quoted: _settings?.quoted, mimetype: File?.mime, filename: _settings?.filename ?? "RA BOT" + RandomName(12), contextInfo: { mentionedJid: Mentioned, forwardingScore: _settings?.forwardingScore }})	
+						return await this.client.sendMessage(from, media, MessageType.document, { quoted: _settings?.quoted, mimetype: File?.mime || "application/x", filename: _settings?.filename ?? "RA BOT" + RandomName(12), contextInfo: { mentionedJid: Mentioned, forwardingScore: _settings?.forwardingScore }})	
 					case "mp4":
 						return await this.client.sendMessage(from, media, MessageType.video, { caption: _settings?.caption, quoted: _settings?.quoted, viewOnce: _settings?.viewOnce ?? false, contextInfo: { mentionedJid: Mentioned, forwardingScore: _settings?.forwardingScore } })
 					case "mp3":
@@ -129,7 +179,7 @@ export class ClientMessage {
 						return await this.client.sendMessage(from, media, MessageType.sticker, { quoted: _settings?.quoted, contextInfo: { mentionedJid: Mentioned, forwardingScore: _settings?.forwardingScore }})
 					case "png":
 					case "jpg":
-						return await this.client.sendMessage(from, media, MessageType.image, { caption: _settings?.caption, quoted: _settings?.quoted, viewOnce: _settings?.viewOnce ?? false, contextInfo: { mentionedJid: Mentioned, forwardingScore: _settings?.forwardingScore }, thumbnail: (await (await this.compressGambar(media)).toString()) })
+						return await this.client.sendMessage(from, media, MessageType.image, { caption: _settings?.caption, quoted: _settings?.quoted, viewOnce: _settings?.viewOnce ?? false, contextInfo: { mentionedJid: Mentioned, forwardingScore: _settings?.forwardingScore }, thumbnail: (await (await this.compressGambar(media)) as any) })
 					default:
 						return await this.client.sendMessage(from, media, MessageType.document, { quoted: _settings?.quoted, mimetype: File?.mime, filename: _settings?.filename ?? "RA BOT" + RandomName(12), contextInfo: { mentionedJid: Mentioned, forwardingScore: _settings?.forwardingScore }})	
 				}

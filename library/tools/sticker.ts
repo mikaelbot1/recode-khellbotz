@@ -13,6 +13,26 @@ export const stickerWhatsappFormatterWithCropped = async (media: Buffer | string
 		return resolve(stiker)
 	})
 }
+
+export const convertWebpNoCrop = async (input: string): Promise <string> => {
+	return new Promise (async (resolve, reject) => {
+		const Path: string = autoPath("webp")
+		ffmpeg(input)
+		.inputFormat(`${input.split('.')[2]}`)
+        .on('error', function (error) {
+			if (fs.existsSync(input)) fs.unlinkSync(input)
+			if (fs.existsSync(Path)) fs.unlinkSync(Path)
+			return reject(error)
+		})
+		.on('end', async function () {
+			if (fs.existsSync(input)) fs.unlinkSync(input)
+			return resolve(Path)
+		})
+		.addOutputOptions([`-vcodec`,`libwebp`,`-vf`,`scale='min(320,iw)':min'(320,ih)':force_original_aspect_ratio=decrease,fps=15, pad=320:320:-1:-1:color=white@0.0, split [a][b]; [a] palettegen=reserve_transparent=on:transparency_color=ffffff [p]; [b][p] paletteuse`])
+		.toFormat('webp')
+		.save(Path)
+	})
+}
 export const convertToWebp = async (input: string): Promise <string> => {
 	return new Promise (async (resolve, reject) => {
 		const Path: string = autoPath("webp")

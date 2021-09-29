@@ -3,8 +3,12 @@ import { WAChatUpdate,  WAContact, WAGroupMetadata, WAConnection, WAMessage, WAG
 import moment from "moment-timezone";
 import { getBuffer } from "../../functions/function"
 import * as fs from "fs";
-import { GroupMetadata, HandlingData, Formatter } from "../../typings";
+import { GroupMetadata, HandlingData, IRegister } from "../../typings";
 import CreateApi from "../../routers/api/index";
+
+
+let Path: string = "./library/database/register.json";
+if (!fs.existsSync(Path)) fs.writeFileSync(Path, JSON.stringify([]))
 
 export class HandlerData  {
 	public getRespon (chats: WAChatUpdate, client: WAConnection): HandlingData | undefined {
@@ -12,13 +16,15 @@ export class HandlerData  {
 		const mess: WAMessage | undefined = chats.messages?.all()[0];
 		if (mess?.key && mess.key.remoteJid === 'status@broadcast') return;
 		const validation: Validations = new Validations()
-		const { message, from, isGroupMsg, type, typeQuoted,  quotedMsg, media } = validation.Validations(mess as WAMessage);
+		const { message, from, isGroupMsg, type, typeQuoted,  quotedMsg, media, command } = validation.Validations(mess as WAMessage);
+		const database: IRegister[] = JSON.parse(fs.readFileSync(Path).toString()) as IRegister[];
 		const sender: string | null | undefined =  mess?.key.fromMe ? client.user.jid : isGroupMsg ? mess?.participant : mess?.key.remoteJid
 		const contacts: string | WAContact | any = mess?.key.fromMe ? client.user.jid : client.contacts[sender || ''] || { notify: sender?.replace(/@.+/, '') }
 		const content: string = JSON.stringify(message.message);
 		const pushname: string = mess?.key.fromMe ? client.user.name : contacts?.notify || contacts.vname || contacts.name || 'Tidak Terdeteksi'
 		const fromMe: boolean | undefined | null = mess?.key.fromMe ?? false;
 		const isBot: boolean | undefined = mess?.key ? mess.key.id?.startsWith('3EB0') ? true : mess.key.id?.startsWith("RABOT") : false;
+		if (isBot) return;
 		const botNumber: string = client.user.jid;
 		const ownerNumber: string[] = [String(process.env.ownerNumber), botNumber];
 		const sendOwner: string = ownerNumber[0];
@@ -34,7 +40,9 @@ export class HandlerData  {
         const isQuotedVideo: boolean = typeQuoted === "videoMessage";
         const isQuotedAudio: boolean = typeQuoted === 'audioMessage';
         const isQuotedDokumen: boolean = typeQuoted === 'documentMessage';
-		const isQuotedStickerGif: boolean = media?.message?.stickerMessage?.isAnimated || false
+		const isQuotedStickerGif: boolean = media?.message?.stickerMessage?.isAnimated || false;
+		const register: IRegister | undefined = database.find((value: IRegister | undefined) => value?.id == sender)
+		const prefix: string = register?.multi ? /^[°•π÷×¶∆£¢€¥®™+✓_=|~!?@#$%^&.©^]/gi.test(command) ? (command.match(/^[°•π÷×¶∆£¢€¥®™+✓_=|~!?@#$%^&.©^]/gi) as RegExpMatchArray)[0] : "Multi Prefix" : register?.prefix ?? "."
 		const id: proto.WebMessageInfo = mess as proto.WebMessageInfo
 		const groupMetadata = async (): Promise <GroupMetadata> => {
 			const groupMetadata: WAGroupMetadata | null = isGroupMsg ? await client.groupMetadata(from) : null;
@@ -68,6 +76,6 @@ export class HandlerData  {
 			return respon
 		}
 		const createAPI: CreateApi = new CreateApi()
-		return { ...validation.Validations(mess as WAMessage), sender,contacts, content,  pushname, fromMe, isBot, botNumber,  ownerNumber, sendOwner, isOwner, isMedia, isGambar,  isVideo, isAudio, isSticker, Jam, isQuotedSticker, isQuotedImage,  isQuotedVideo, isQuotedAudio,  isQuotedDokumen, groupMetadata, ToBuffer,  getQuotedMsg, id, isQuotedStickerGif, createAPI } as HandlingData
+		return { ...validation.Validations(mess as WAMessage), sender,contacts, content,  pushname, fromMe, isBot, botNumber,  ownerNumber, sendOwner, isOwner, isMedia, isGambar,  isVideo, isAudio, isSticker, Jam, isQuotedSticker, isQuotedImage,  isQuotedVideo, isQuotedAudio,  isQuotedDokumen, groupMetadata, ToBuffer,  getQuotedMsg, id, isQuotedStickerGif, createAPI,  prefix } as HandlingData
 	}
 }

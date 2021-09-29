@@ -38,6 +38,7 @@ export const WebpToMp4 = async (input: string): Promise <string> => {
 		}
 	})
 }
+
 export const WebpToGif = async (input: string): Promise <string> => {
 	return new Promise (async (resolve, reject) => {
 		let output: string = autoPath("gif")
@@ -53,3 +54,4 @@ export const WebpToGif = async (input: string): Promise <string> => {
 		})
 	})
 }
+

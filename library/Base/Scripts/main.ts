@@ -5,8 +5,15 @@ import { HandlerData, CommandHandler, ClientMessage } from ".";
 import Call from "./CallHandling";
 import chalk from "chalk";
 import { HandlingData } from "../../typings";
+import * as fs from "fs";
 
-globalThis.Publik = false
+let PathConfig: string = "./library/database/config.json";
+
+if (fs.existsSync(PathConfig)) fs.writeFileSync(PathConfig, JSON.stringify({
+	public: false
+}))
+
+let Public: { public: boolean } = JSON.parse(fs.readFileSync(PathConfig).toString())
 
 export class MainHandler extends Connections {
 	constructor (public client: WAConnection) {
@@ -28,7 +35,7 @@ export class MainHandler extends Connections {
 		this.client.on("chat-update", async (chats: WAChatUpdate) => {
 			const data: HandlingData | undefined =  this.HandlingData.getRespon(chats, this.client)
 			if (!data) return
-			if (!globalThis.Publik && !data.isOwner) return;
+			if (!Public && !data.isOwner) return;
 			globalThis.Client = new CommandHandler()
 			const Cli: ClientMessage = new ClientMessage(this.client, data);
 			(await import("../../src/main")).onPattern()

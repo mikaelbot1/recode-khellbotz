@@ -30,6 +30,7 @@ export declare class HandlingData extends Validator {
 	getQuotedMsg: (id?: string) => Promise <proto.WebMessageInfo>;
 	isQuotedStickerGif: boolean;
 	createAPI: CreateApi;
+	prefix: string;
 }
 export declare class Validator {
 	message: proto.IFutureProofMessage;
@@ -50,7 +51,6 @@ export declare class Validator {
 	getIdButton: string | null | undefined;
 	fileInfo: () => FileInformation;
 	chats: WAMessage;
-	prefix: string;
 }
 export interface FileInformation { 
 	durasi: number | null;
@@ -102,6 +102,8 @@ export declare interface getCommand {
 	loading?: boolean;
 	skipMenu?: boolean;
 	simple?: boolean;
+	isUsername?: boolean;
+	isJudul?: boolean;
 }
 export declare class EventEmitter implements getCommand {
 	className: string;
@@ -132,4 +134,6 @@ export declare class EventEmitter implements getCommand {
 	loading?: boolean;
 	skipMenu?: boolean;
 	simple?: boolean;
+	isUsername?: boolean;
+	isJudul?: boolean;
 }

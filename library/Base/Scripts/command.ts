@@ -1,9 +1,14 @@
 import { WAConnection } from "@adiwajshing/baileys";
-import { getCommand, HandlingData, EventEmitter } from "../../typings";
+import { getCommand, HandlingData, EventEmitter, IRegister } from "../../typings";
 import chalk from "chalk";
 import { ClientMessage  } from ".";
+import * as fs from "fs";
 import { config } from 'dotenv';
 config({ path: './.env' })
+
+let Path: string = "./library/database/register.json";
+
+if (!fs.existsSync(Path)) fs.writeFileSync(Path, JSON.stringify([]))
 
 const Events: any = {};
 const antispam: Set<String> = new Set();
@@ -17,7 +22,7 @@ export class CommandHandler {
 	public res: ClientMessage  | undefined;
 	constructor() {
     }
-	public on (className: string, callback: (data: HandlingData, res: ClientMessage) => void, _event: getCommand) {
+	public on (className: string, callback: (data: HandlingData, res: ClientMessage, event: EventEmitter) => void, _event: getCommand) {
 		_event.withPrefix = _event.withPrefix ?? true
 		_event.enable = _event.enable ? _event.enable : true
 		if (!this.events[className]) 
@@ -37,6 +42,11 @@ export class CommandHandler {
 			this.client = client
 			this.res = res;
 			const { isOwner, prefix,  command, isGroupMsg, from, id,  groupMetadata, Jam, fromMe, args, pushname, sender, media, getIdButton } = data;
+			const database: IRegister[] = JSON.parse(fs.readFileSync(Path).toString()) as IRegister[];
+			if (!database.find((value) => value.id == sender)) {
+				database.push({ id: sender as string, status: false, hit: 1, multi: true, prefix: ".", simple: false})
+				fs.writeFileSync(Path, JSON.stringify(database, null, 2))
+			}
 			try {
 				for (const className in this.events) {
 					const event: EventEmitter = this.events[className];
@@ -48,13 +58,20 @@ export class CommandHandler {
 					event.simple = (event.simple == undefined) ? false : event.simple
 					event.antispam = (event.antispam == undefined) ? true : event.antispam
 					event.isBlockir = (event.isBlockir == undefined) ? true : event.isBlockir
+					if (database.find((value) => value.id == sender)) {
+						database[database.findIndex((value: IRegister) => value.id == sender)].hit++
+						fs.writeFileSync(Path, JSON.stringify(database, null, 2))
+					}
 					if (event.isOwner && !isOwner) return
 					if (event.isBlockir && this.client.blocklist.find((values: string) => values === sender?.replace("@c.us", "@s.whatsapp.net"))) return;
 					if (event.antispam && !isOwner && !!doubleSpam.has(sender as string)) return;
 					if (event.antispam && !isOwner && !!rejectSpam.has(sender as string)) return;
 					if (event.antispam && !isOwner && !!waitSpam.has(sender as string)) return rejectSpam.add(sender as string) && await this.res.reply(from, `*「❗」* Mohon maaf kak, Tunggu perintah sebelumnya berakhir terlebih dahulu jika kakak ingin menggunakan perintah berikutnya`, id)
 					if (event.antispam && !isOwner && !!antispam.has(sender as string)) return doubleSpam.add(sender as string) && await this.res.reply(from, `*「❗」* Maaf ka setelah anda menggunakan command ada jeda ${event.delaySpam ?? 7000} detik untuk anda bisa menggunakan command kembali`, id)
+					if (event.helpers && /^(?:-|--)(help)$/i.test(args[0])) return this.res.reply(from,event.helpers, id)
+					if (event.isJudul && !args[0]) return  this.res.reply(from, "*「❗」* Mohon maaf kak, harap masukkan masukkan judul untuk menggunakan perintah ini", id)
 					if (event.isQuerry && !args[0]) return this.res.reply(from, "*「❗」* Mohon maaf kak, harap masukkan querry untuk menggunakan perintah tersebut", id)
+					if (event.isUsername && !args[0]) return this.res.reply(from, "*「❗」*  Mohon maaf kak, Harap masukkan Username " + event.className + " untuk menjalankan perintah ini", id);
 					if (event.isMedia && !media) return this.res.reply(from, "*「❗」*  Mohon maaf kak, harap masukkan media jika kamu ingin menggunakan perintah tersebut", id)
 					if (event.isUrl && !res.respon.getUrl(args.join(" "))) return this.res.reply(from, "*「❗」* Mohon maaf kak, untuk menggunakan perintah ini kakak harus memasukkan url agar bot dapat mengeksekusi perintah tersebut", id)
 					if (event.isPrivate && !isOwner && isGroupMsg) return this.res.reply(from, "*「❗」* Mohon maaf kak, Perintah ini hanya dapat di gunakan di personal chat saja kak", id)
@@ -64,7 +81,7 @@ export class CommandHandler {
 					try {
 						if (event.antispam && !isOwner) waitSpam.add(sender as string);
 						if (event.loading && !event.simple) await this.res.reply(from, `*⌛* Mohon tunggu sebentar bot sedang melaksanakan perintah`, id)
-						return void  (await event.callback(data, res)) 
+						return void  (await event.callback(data, res, event)) 
 					} catch (err) {
 						if (event.antispam && !!rejectSpam.has(sender as string)) rejectSpam.delete(sender as string)
 						if (event.antispam && !!waitSpam.has(sender as string)) waitSpam.delete(sender as string)

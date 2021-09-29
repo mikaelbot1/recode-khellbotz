@@ -18,6 +18,8 @@ export declare class ToolsMethod {
 	stickerWhatsappFormatterWithCropped: (media: Buffer | string, pakage?: string, author?: string) => Promise <Buffer>;
 	WebpToGif: (input: string) => Promise <string>
 	WebpToMp4: (input: string) => Promise <string>
+	Triggered: (input: string, output: string) => Promise <string>;
+	convertWebpNoCrop: (input: string) => Promise <string>
 }
 export declare class Formatter {
 	LogLogin: () => void;
@@ -36,5 +38,7 @@ export declare class Formatter {
 	WebpToGif: (input: string) => Promise <string>
 	WebpToMp4: (input: string) => Promise <string>
 	UserAgent (): string;
-	RandomArray (array: any[]): any[]
+	RandomArray (array: any[]): any[];
+	Triggered: (input: string, output: string) => Promise <string>;
+	convertWebpNoCrop: (input: string) => Promise <string>
 }
