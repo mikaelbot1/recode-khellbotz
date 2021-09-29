@@ -52,7 +52,7 @@ npm start
 
 ---
 
-### GA SUPPORT TERMUX LAGI PAKE SHARP
+### It doesn't support termux because it uses sharp
 
 Notes : 
 Still in the process of updating
@@ -61,6 +61,18 @@ Still in the process of updating
 
 # SETTINGS
 - Change Owner Number [here](https://github.com/rayyreall/Bot-Whatsapp/blob/master/.env)
+- Change Your Proxy (if you don't want an error if you scrap) [here](https://github.com/rayyreall/Bot-Whatsapp/blob/master/app.json)
+
+
+# THANKS TO
+- [`Adiwajshing`](https://github.com/adiwajshing)
+- [`Shah`](https://github.com/smashah)
+- Alen Saito
+- LORD MANU 😎
+- Sheeltear
+- Adiwajshing
+- Djodi Wibu sejati
+- dll (kalo ada yang protes ga di taro cp/ comit aja ribet)
 
 
 ### My Stat
