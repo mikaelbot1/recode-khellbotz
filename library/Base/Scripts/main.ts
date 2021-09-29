@@ -5,15 +5,16 @@ import { HandlerData, CommandHandler, ClientMessage } from ".";
 import Call from "./CallHandling";
 import chalk from "chalk";
 import { HandlingData } from "../../typings";
-import * as fs from "fs";
 
-let PathConfig: string = "./library/database/config.json";
+export let Public: boolean = false;
 
-if (fs.existsSync(PathConfig)) fs.writeFileSync(PathConfig, JSON.stringify({
-	public: false
-}))
-
-let Public: { public: boolean } = JSON.parse(fs.readFileSync(PathConfig).toString())
+export function SettingsPublic (settings: boolean) {
+	if (settings) {
+		Public = true;
+	} else {
+		Public = false;
+	}
+}
 
 export class MainHandler extends Connections {
 	constructor (public client: WAConnection) {
