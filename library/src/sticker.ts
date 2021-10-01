@@ -52,7 +52,7 @@ export var Sticker: void = globalThis.Client.on("sticker", async (data: Handling
 	else	
 	   return void Cli.reply(from, "*「❗」*  Maaf kak Harap Kirim/Reply Gambar/Video yang ingin di ubah menjadi sticker", id)
 	
-}, { event: ["sticker <media>"], tag: "converter", command: ["s", "sticker", "stiker", "stickergif", "stikergif", "sgif"], isMedia: true, loading: false })
+}, { event: ["sticker <media>"], tag: "converter", command: ["s", "sticker", "stiker", "stickergif", "stikergif", "sgif"], isMedia: true, loading: false, withImghelpers: "https://bit.ly/39026d3", helpers: globalThis.Lang.HelpSticker() })
 
 export var Triggereder: void = globalThis.Client.on("triggered", async function (data: HandlingData, Cli: ClientMessage) {
 	const { from, id, media, isGambar, isQuotedImage, isQuotedSticker, isQuotedStickerGif } = data;

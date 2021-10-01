@@ -6,6 +6,7 @@ import { YtSearch } from "./youtube";
 import { MultiPrefix } from "./prefix";
 import { Tiktokstalk } from "./tiktok";
 import { SearchJoox } from "./joox";
+import { googleSearch } from "./google"
 
 // Export 1 aja Bro perwakilan soalnya klo gada di satuin error
 // Muewehehe
@@ -20,4 +21,5 @@ export function onPattern (): void {
 	MultiPrefix
 	Tiktokstalk
 	SearchJoox
+	googleSearch
 }
