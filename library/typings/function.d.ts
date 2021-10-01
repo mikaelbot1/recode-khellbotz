@@ -10,6 +10,7 @@ export declare class FunctionMethod {
 	createExif (Path: string, pakage?: string, author?: string): Promise <string>
 	UserAgent (): string;
 	RandomArray (array: any[]): any[]
+	Checkker (kata: string, validasi: string): string
 }
 export declare class ToolsMethod {
 	Exec: (code: string) => Promise <string>;
@@ -40,5 +41,6 @@ export declare class Formatter {
 	UserAgent (): string;
 	RandomArray (array: any[]): any[];
 	Triggered: (input: string, output: string) => Promise <string>;
-	convertWebpNoCrop: (input: string) => Promise <string>
+	convertWebpNoCrop: (input: string) => Promise <string>;
+	Checkker (kata: string, validasi: string): string
 }

@@ -79,7 +79,7 @@ export declare interface getCommand {
 	prefix?: string;
 	isGroupMsg?: boolean;
 	isOwner?: boolean;
-	help?: string;
+	withImghelpers?: string | Buffer | proto.WebMessageInfo;
 	isBotAdmins?: boolean;
 	isAdmins?: boolean;
 	limit?: {
@@ -104,6 +104,7 @@ export declare interface getCommand {
 	simple?: boolean;
 	isUsername?: boolean;
 	isJudul?: boolean;
+	isQuerryWithReply?: boolean;
 }
 export declare class EventEmitter implements getCommand {
 	className: string;
@@ -136,4 +137,6 @@ export declare class EventEmitter implements getCommand {
 	simple?: boolean;
 	isUsername?: boolean;
 	isJudul?: boolean;
+	withImghelpers?: string | Buffer | proto.WebMessageInfo;
+	isQuerryWithReply?: boolean;
 }
