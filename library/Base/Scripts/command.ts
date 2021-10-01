@@ -69,6 +69,7 @@ export class CommandHandler {
 					if (event.antispam && !isOwner && !!waitSpam.has(sender as string)) return rejectSpam.add(sender as string) && await this.res.reply(from, `*「❗」* Mohon maaf kak, Tunggu perintah sebelumnya berakhir terlebih dahulu jika kakak ingin menggunakan perintah berikutnya`, id)
 					if (event.antispam && !isOwner && !!antispam.has(sender as string)) return doubleSpam.add(sender as string) && await this.res.reply(from, `*「❗」* Maaf ka setelah anda menggunakan command ada jeda ${event.delaySpam ?? 7000} detik untuk anda bisa menggunakan command kembali`, id)
 					if (event.helpers && /^(?:-|--)(help)$/i.test(args[0])) return this.res.reply(from,event.helpers, id)
+					if (event.isQuerry && event.isQuerryWithReply && !args[0] && !bodyQuoted) return  this.res.reply(from, "*「❗」* Mohon maaf kak, harap kirim pesan dengan querry atau kakak juga bisa reply pesan menggunakan caption untuk menggunakan perintah tersebut", id)
 					if (event.isJudul && !args[0]) return  this.res.reply(from, "*「❗」* Mohon maaf kak, harap masukkan masukkan judul untuk menggunakan perintah ini", id)
 					if (event.isQuerry && !args[0]) return this.res.reply(from, "*「❗」* Mohon maaf kak, harap masukkan querry untuk menggunakan perintah tersebut", id)
 					if (event.isUsername && !args[0]) return this.res.reply(from, "*「❗」*  Mohon maaf kak, Harap masukkan Username " + event.className + " untuk menjalankan perintah ini", id);
