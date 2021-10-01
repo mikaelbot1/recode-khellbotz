@@ -135,7 +135,7 @@ export class ClientMessage {
 					case "docs":
 						return await this.client.sendMessage(from, media, MessageType.document, { quoted: _settings?.quoted, mimetype: File?.mime, filename: _settings?.filename ?? "RA BOT" + RandomName(12), contextInfo: { mentionedJid: Mentioned, forwardingScore: _settings?.forwardingScore, externalAdReply: _settings?.autoPreview }})	
 					case "mp4":
-						return await this.client.sendMessage(from, media, MessageType.video, { caption: _settings?.caption, quoted: _settings?.quoted, viewOnce: _settings?.viewOnce ?? false, contextInfo: { mentionedJid: Mentioned, forwardingScore: _settings?.forwardingScore  } })
+						return await this.client.sendMessage(from, media, MessageType.video, { caption: _settings?.caption, quoted: _settings?.quoted, viewOnce: _settings?.viewOnce ?? false, contextInfo: { mentionedJid: Mentioned, forwardingScore: _settings?.forwardingScore  } })	
 					case "mp3":
 						return await this.client.sendMessage(from, media, MessageType.audio, { quoted: _settings?.quoted, ptt: _settings?.ptt, contextInfo: { mentionedJid: Mentioned, forwardingScore: _settings?.forwardingScore, externalAdReply: _settings?.autoPreview }})
 					case "webp":
