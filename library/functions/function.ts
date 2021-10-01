@@ -91,7 +91,31 @@ export 	function RandomArray(array: any[]): any[]{
 // https://github.com/thiennq/fake-user-agent
 // https://github.com/VeNoMouS/cloudscraper
 //
-export function UserAgent (): string {
+export function UserAgent (os?: "Windows" | "Linux" | "Android" | "Macintosh" | "iPhone" | "Mac OS" | "default"): string {
+	if (!os) os = "Windows";
 	let UA: string[] = JSON.parse(fs.readFileSync("./library/database/user-agent.json").toString());
+	let getOs: string = os.toLowerCase()
+	switch (getOs) {
+		case "windows":
+		       UA = UA.filter((value: string) => /(Windows)/gi.test(value))
+		break
+		case "linux":
+		        UA = UA.filter((value: string) => /(Linux)/gi.test(value))
+		break;
+		case "android":
+		        UA = UA.filter((value: string) => /(Android)/gi.test(value))
+		break
+		case "macintosh":
+		        UA = UA.filter((value: string) => /(Macintosh)/gi.test(value))
+		break
+		case "iphone":
+		        UA = UA.filter((value: string) => /(iPhone)/gi.test(value))
+		break
+		case "default":
+		        UA = ["Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36"]
+		break
+		default:
+		    	UA = UA
+	}
 	return UA[Math.floor(Math.random() * (UA.length))];
 }
