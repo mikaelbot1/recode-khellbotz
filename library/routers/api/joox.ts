@@ -1,13 +1,15 @@
 import axios, { AxiosResponse } from "axios";
-import cheerio from "cheerio";
 import * as fs from "fs";
 import { JooxAll, JooxItems, SongInfo, JooxDown, JooxInterfaceDown, Joox, JooxKBPSMap, jooxPlayMusic  } from "../../typings";
 import { UserAgent } from "../../functions/function";
 import filesize from "filesize";
+import Google from "./google"
 
 
-export default class JOOXMusik {
-	constructor () {}
+export default class JOOXMusik extends Google {
+	constructor () {
+		super()
+	}
 	public JooxDownloader = async (id: string): Promise <JooxDown|null> => {
 		return new Promise(async (resolve, reject) => {
 			try {
