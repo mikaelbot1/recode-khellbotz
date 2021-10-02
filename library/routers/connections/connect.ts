@@ -19,7 +19,7 @@ export default class Connections {
 		let respon: [number, number, number]
 		try {
 			const getData: AxiosResponse = await axios.get("https://web.whatsapp.com/check-update?version=1&platform=web")
-			let Json: getClientVersion = JSON.parse(getData.data)
+			let Json: getClientVersion = getData.data;
 			respon = [Number(Json.currentVersion.split(".")[0]), Number(Json.currentVersion.split(".")[1]), Number(Json.currentVersion.split(".")[2])]
 		} catch (err) {
 			respon = [2, 2134, 10]
