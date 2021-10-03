@@ -9,8 +9,7 @@ export declare class FunctionMethod {
 	autoPath: (ext?: string)  => string
 	createExif (Path: string, pakage?: string, author?: string): Promise <string>
 	UserAgent (): string;
-	RandomArray (array: any[]): any[]
-	Checkker (kata: string, validasi: string): string
+	RandomArray (array: any[]): any[];=
 }
 export declare class ToolsMethod {
 	Exec: (code: string) => Promise <string>;
@@ -42,5 +41,4 @@ export declare class Formatter {
 	RandomArray (array: any[]): any[];
 	Triggered: (input: string, output: string) => Promise <string>;
 	convertWebpNoCrop: (input: string) => Promise <string>;
-	Checkker (kata: string, validasi: string): string
 }
