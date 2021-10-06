@@ -45,8 +45,8 @@ export async function getBuffer (Url: string, options?: Headers): Promise<Buffer
     }).buffer()
     return data
 }
-export function getUrl (Link: string): RegExpMatchArray | null {
-	return Link.match(new RegExp(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/, 'gi'))
+export function getUrl (Link: string | undefined): RegExpMatchArray | null {
+	return Link?.match(new RegExp(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/, 'gi')) || null
 }
 export function Tunggu(ms: number): Promise <unknown> {
     return new Promise((resolve) => setTimeout(resolve, ms))
