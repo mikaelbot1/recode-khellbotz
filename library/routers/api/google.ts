@@ -1,11 +1,14 @@
-import request,{ RequestCallback } from "request";
+import request from "request";
 import { RandomArray, getUrl } from "../../functions/function";
 import cheerio, { CheerioAPI, Element, Cheerio } from "cheerio";
 import { SearchGoogle } from "../../typings/google";
 import translate, { ITranslateResponse, languages }  from "@vitalets/google-translate-api";
+import Brainly from "./brainly";
 
-export default class Google {
-	constructor () {}
+export default class Google extends Brainly {
+	constructor () {
+		super();
+	}
 	public GoogleImages = async (judul: string): Promise <string[]|null> => {
 		return new Promise (async (resolve, reject) => {
 			try {

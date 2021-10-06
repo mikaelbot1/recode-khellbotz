@@ -22,6 +22,7 @@ export default class Connections {
 			let Json: getClientVersion = getData.data;
 			respon = [Number(Json.currentVersion.split(".")[0]), Number(Json.currentVersion.split(".")[1]), Number(Json.currentVersion.split(".")[2])]
 		} catch (err) {
+			console.log(err)
 			respon = [2, 2134, 10]
 		}
 		return respon

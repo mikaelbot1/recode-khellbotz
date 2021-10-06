@@ -1,8 +1,9 @@
 import axios, { AxiosResponse } from "axios";
+import { JSDOM, ResourceLoader  } from "jsdom";
 import cheerio, { CheerioAPI } from "cheerio";
 import { response } from "../../plugins";
 import Joox from "./joox";
-import { Formatter, TiktokStalk, FormatPostTTDownloader, ITTDownloader, IMussically, ITiktokVideoMetadata } from "../../typings";
+import { Formatter, TiktokStalk, FormatPostTTDownloader, ITTDownloader, IMussically, ITiktokVideoMetadata,  SnaptikDown  } from "../../typings";
 import { config } from "dotenv";
 config({ path: "./.env"})
 
