@@ -1,23 +1,28 @@
 import { WAConnection } from "@adiwajshing/baileys";
-import { getCommand, HandlingData, EventEmitter, IRegister } from "../../typings";
+import { getCommand, HandlingData, EventEmitter, IRegister, IStickerCmd, EventCommand, EventsEmit   } from "../../typings";
 import chalk from "chalk";
 import { ClientMessage  } from ".";
 import * as fs from "fs";
 import { config } from 'dotenv';
-config({ path: './.env' })
+config({ path: './.env' });
 
 let Path: string = "./library/database/register.json";
+let SaveStiCmd: string = "./library/database/sticmd.json";
 
 if (!fs.existsSync(Path)) fs.writeFileSync(Path, JSON.stringify([]))
+if (!fs.existsSync(SaveStiCmd)) fs.writeFileSync(SaveStiCmd, JSON.stringify([]))
 
 const Events: any = {};
+const Detections: any = {}
 const antispam: Set<String> = new Set();
 const waitSpam: Set<String> = new Set();
 const rejectSpam: Set<String> = new Set();
 const doubleSpam: Set<String> = new Set();
+const spamValidasi: Set<String> = new Set();
 
 export class CommandHandler {
 	public events: any = Events;
+	public detector: any = Detections;
 	public client: WAConnection | undefined;
 	public res: ClientMessage  | undefined;
 	constructor() {
@@ -37,11 +42,49 @@ export class CommandHandler {
 			..._event
 		}
 	}
+	public open (className: string, callback: (data: HandlingData, res: ClientMessage, event: EventsEmit ) => void, _event: EventCommand = {}) {
+		_event.enable = _event.enable ? _event.enable : true
+		if (!this.detector[className]) this.detector[className] = {
+			target: className,
+			callback,
+			..._event
+		}
+		this.detector[className] = {
+			...this.detector[className],
+			callback,
+			..._event
+		}
+	}
+	public getEventsDetector (client: WAConnection, data: HandlingData, res: ClientMessage) {
+		return new Promise (async (resolve, reject) => {
+			this.client = client;
+			this.res = res;
+			let { isOwner, isGroupMsg, groupMetadata, fromMe, Jam, sender, args, pushname } = data;
+			try {
+				for (const className in this.detector) {
+					const event: EventsEmit = this.detector[className];
+					if (!event.enable && !isOwner) continue;
+					if (event.isGroupMsg && !isGroupMsg) continue;
+					if (event.isGroupAdmins && (await groupMetadata()).isGroupAdmins) continue;
+					let hasil: boolean = false
+					try {
+						hasil = (await event.callback(data, res, event)) 
+					} catch (err) {
+						console.log(err)
+					} finally {
+						if (hasil) console.log(chalk.keyword('red')('\x1b[1;31m~\x1b[1;37m>'), chalk.keyword('blue')(`[\x1b[1;32m${chalk.hex('#009940').bold('RECORD')}]`), chalk.red.bold('\x1b[1;31m=\x1b[1;37m>'),chalk.cyan('\x1bmSTATUS :\x1b'), chalk.hex('#fffb00')(fromMe ? 'SELF' : 'PUBLIK'), chalk.greenBright('[COMMAND]'), chalk.keyword('red')('\x1b[1;31m~\x1b[1;37m>'), chalk.blueBright(hasil), chalk.hex('#f7ef07')(`[${args?.length}]`),chalk.red.bold('\x1b[1;31m=\x1b[1;37m>'), chalk.hex('#26d126')('[PENGIRIM]'),chalk.hex('#f505c1')(pushname), chalk.hex('#ffffff')(`(${sender?.replace(/@s.whatsapp.net/i, '')})`), chalk.greenBright('IN'), chalk.hex('#0428c9')(`${(await groupMetadata()).groupMetadata?.subject}`), chalk.keyword('red')('\x1b[1;31m~\x1b[1;37m>'), chalk.hex('#f2ff03')('[DATE] =>'),chalk.greenBright(Jam.split(' GMT')[0]))
+					}
+				}
+			} catch (err) {
+				return void console.log(err)
+			} 
+		})
+	}
 	public waitEventsUpdate (client: WAConnection, data: HandlingData, res: ClientMessage) {
 		return new Promise (async (resolve, reject) => {
 			this.client = client
 			this.res = res;
-			const { isOwner, prefix,  command, isGroupMsg, from, id,  groupMetadata, Jam, fromMe, args, pushname, sender, media, getIdButton } = data;
+			let { isOwner, prefix,  command, isGroupMsg, from, id,  groupMetadata, Jam, fromMe, args, pushname, sender, media, getIdButton, bodyQuoted, isSticker, FileSha, mentioned } = data;
 			const database: IRegister[] = JSON.parse(fs.readFileSync(Path).toString()) as IRegister[];
 			if (!database.find((value) => value.id == sender)) {
 				database.push({ id: sender as string, status: false, hit: 1, multi: true, prefix: ".", simple: false})
@@ -51,25 +94,34 @@ export class CommandHandler {
 				for (const className in this.events) {
 					const event: EventEmitter = this.events[className];
 					if (!event.enable && !isOwner) continue;
+					if (isSticker) {
+						const _database: IStickerCmd[] = JSON.parse(fs.readFileSync(SaveStiCmd).toString()) as IStickerCmd[];
+						if (_database.find((value) => value.id == sender)) command =  _database.find((value) => value.id == sender)?.cmd.find((values) => values.id === FileSha)?.command || ""
+						command = prefix + command;
+					}
 					const getPrefix: string = this.checkPrefix(prefix, event);
+					let PrefixKhusus: boolean = command.startsWith(prefix);
 					let _command: string = event.isButton ? getIdButton ?? "" : command.startsWith(getPrefix) ? command.replace(getPrefix, "") : command
 					const isCmd: boolean = this.getCmd(event.isButton ? getIdButton ?? "" : command, event.command, getPrefix)
 					if (!isCmd) continue
-					event.simple = (event.simple == undefined) ? false : event.simple
-					event.antispam = (event.antispam == undefined) ? true : event.antispam
-					event.isBlockir = (event.isBlockir == undefined) ? true : event.isBlockir
+					event.simple = (event.simple == undefined) ? false : event.simple;
+					event.antispam = (event.antispam == undefined) ? true : event.antispam;
+					event.isBlockir = (event.isBlockir == undefined) ? true : event.isBlockir;
 					if (database.find((value) => value.id == sender)) {
 						database[database.findIndex((value: IRegister) => value.id == sender)].hit++
 						fs.writeFileSync(Path, JSON.stringify(database, null, 2))
 					}
-					if (event.isOwner && !isOwner) return
+					if (event.isOwner && !isOwner) return;
 					if (event.isBlockir && this.client.blocklist.find((values: string) => values === sender?.replace("@c.us", "@s.whatsapp.net"))) return;
 					if (event.antispam && !isOwner && !!doubleSpam.has(sender as string)) return;
 					if (event.antispam && !isOwner && !!rejectSpam.has(sender as string)) return;
 					if (event.antispam && !isOwner && !!waitSpam.has(sender as string)) return rejectSpam.add(sender as string) && await this.res.reply(from, `*「❗」* Mohon maaf kak, Tunggu perintah sebelumnya berakhir terlebih dahulu jika kakak ingin menggunakan perintah berikutnya`, id)
 					if (event.antispam && !isOwner && !!antispam.has(sender as string)) return doubleSpam.add(sender as string) && await this.res.reply(from, `*「❗」* Maaf ka setelah anda menggunakan command ada jeda ${event.delaySpam ?? 7000} detik untuk anda bisa menggunakan command kembali`, id)
-					if (event.helpers && /^(?:-|--)(help)$/i.test(args[0])) return this.res.reply(from,event.helpers, id)
+					if (event.withImghelpers && event.helpers && /^(?:-|--)help(?:s|)$/i.test(args[0])) return await this.res.sendFile(from, event.withImghelpers, { caption: event.helpers, quoted: id })
+					if (event.helpers && /^(?:-|--)help(?:s|)$/.test(args[0])) return this.res.reply(from,event.helpers, id)
 					if (event.isQuerry && event.isQuerryWithReply && !args[0] && !bodyQuoted) return  this.res.reply(from, "*「❗」* Mohon maaf kak, harap kirim pesan dengan querry atau kakak juga bisa reply pesan menggunakan caption untuk menggunakan perintah tersebut", id)
+					if (event.limitText && args[0] && Number(args.join(" ").length) >= Number(event.limitText)) return this.res.reply(from, `*「❗」* Mohon maaf kak, max kata untuk perintah ${command} adalah ${event.limitText}`, id)
+					if (event.isMentioned && !mentioned[0]) return this.res.reply(from, "*「❗」* Mohon maaf kak, harap tag seseorang untuk melakukan perintah ini", id)
 					if (event.isJudul && !args[0]) return  this.res.reply(from, "*「❗」* Mohon maaf kak, harap masukkan masukkan judul untuk menggunakan perintah ini", id)
 					if (event.isQuerry && !args[0]) return this.res.reply(from, "*「❗」* Mohon maaf kak, harap masukkan querry untuk menggunakan perintah tersebut", id)
 					if (event.isUsername && !args[0]) return this.res.reply(from, "*「❗」*  Mohon maaf kak, Harap masukkan Username " + event.className + " untuk menjalankan perintah ini", id);
@@ -77,8 +129,8 @@ export class CommandHandler {
 					if (event.isUrl && !res.respon.getUrl(args.join(" "))) return this.res.reply(from, "*「❗」* Mohon maaf kak, untuk menggunakan perintah ini kakak harus memasukkan url agar bot dapat mengeksekusi perintah tersebut", id)
 					if (event.isPrivate && !isOwner && isGroupMsg) return this.res.reply(from, "*「❗」* Mohon maaf kak, Perintah ini hanya dapat di gunakan di personal chat saja kak", id)
 					if (event.isGroupMsg && !isGroupMsg && !isOwner) return await res.reply(from, "*「❗」* Maaf kak perintah ini hanya bisa di gunakan di dalam grup saja kak", id)
-					if (event.isAdmins && !(await groupMetadata()).isGroupAdmins) return await this.res.reply(from, "*「❗」*  Mohon Maaf kak, Perintah ini dapat digunakan khusus untuk admin group saja", id)
-					if (event.isBotAdmins && !(await groupMetadata()).isBotAdmins) return await this.res.reply(from, "*「❗」* Mohon Maaf Kak, Perintah ini dapat di gunakan jika bot menjadi admin group", id)
+					if (event.isAdmins && !isOwner && !(await groupMetadata()).isGroupAdmins) return await this.res.reply(from, "*「❗」*  Mohon Maaf kak, Perintah ini dapat digunakan khusus untuk admin group saja", id)
+					if (event.isBotAdmins && !isOwner && !(await groupMetadata()).isBotAdmins) return await this.res.reply(from, "*「❗」* Mohon Maaf Kak, Perintah ini dapat di gunakan jika bot menjadi admin group", id)
 					try {
 						if (event.antispam && !isOwner) waitSpam.add(sender as string);
 						if (event.loading && !event.simple) await this.res.reply(from, `*⌛* Mohon tunggu sebentar bot sedang melaksanakan perintah`, id)
