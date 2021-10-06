@@ -105,6 +105,8 @@ export declare interface getCommand {
 	isUsername?: boolean;
 	isJudul?: boolean;
 	isQuerryWithReply?: boolean;
+	isMentioned?: boolean;
+	limitText?: number;
 }
 export declare class EventEmitter implements getCommand {
 	className: string;
@@ -139,4 +141,6 @@ export declare class EventEmitter implements getCommand {
 	isJudul?: boolean;
 	withImghelpers?: string | Buffer | proto.WebMessageInfo;
 	isQuerryWithReply?: boolean;
+	isMentioned?: boolean
+	limitText?: number;
 }

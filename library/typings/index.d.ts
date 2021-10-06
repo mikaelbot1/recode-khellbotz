@@ -6,3 +6,6 @@ export * from "./database";
 export * from "./youtube";
 export * from "./tiktok";
 export * from "./joox";
+export * from "./brainly";
+export * from "./lirik";
+export * from "./detector";

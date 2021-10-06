@@ -6,3 +6,12 @@ export declare interface IRegister {
 	prefix: string;
 	simple: boolean;
 }
+
+export declare interface IStickerCmd {
+	id: string;
+	cmd: ICmdSticker[]
+}
+export declare interface ICmdSticker {
+	id: string;
+	command: string;
+}

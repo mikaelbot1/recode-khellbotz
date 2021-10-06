@@ -47,6 +47,11 @@ export declare interface IMussically {
 	original: string | undefined;
 }
 
+export declare interface SnaptikDown {
+	thumbnail: string;
+	nowm1: string;
+	nowm2: string;
+}
 export declare class ITiktokVideoMetadata {
 	id: string;
 	desk: string;
