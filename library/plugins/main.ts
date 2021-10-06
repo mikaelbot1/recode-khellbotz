@@ -1,5 +1,5 @@
-import { LogLogin, getBuffer, getUrl,  Tunggu,  RandomName, Runtime, autoPath, UserAgent, RandomArray } from "../functions/function";
-import { Exec, convertToWebp, createWmSticker, stickerWhatsappFormatterWithCropped, WebpToGif, WebpToMp4, convertWebpNoCrop } from "../tools"
+import { LogLogin, getBuffer, getUrl,  Tunggu,  RandomName, Runtime, autoPath, UserAgent, RandomArray,  Checkker  } from "../functions/function";
+import { Exec, convertToWebp, createWmSticker, stickerWhatsappFormatterWithCropped, WebpToGif, WebpToMp4, convertWebpNoCrop, CreateImageToCircle  } from "../tools"
 import {  FunctionMethod, ToolsMethod } from "../typings";
 import { Ucapan } from "./static";
 import {  createExif } from "./createExif";
@@ -17,7 +17,8 @@ const Functions: FunctionMethod  = {
 	autoPath,
 	createExif,
 	UserAgent,
-	RandomArray
+	RandomArray,
+	Checkker
 }
 const Tools: ToolsMethod = {
 	Exec,
@@ -27,7 +28,8 @@ const Tools: ToolsMethod = {
 	WebpToGif,
 	WebpToMp4, 
 	Triggered,
-	convertWebpNoCrop
+	convertWebpNoCrop,
+	CreateImageToCircle 
 }
 export const response: FunctionMethod | ToolsMethod = {
 	...Functions,
