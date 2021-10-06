@@ -1,4 +1,5 @@
-import { WAOpenResult, WAChatUpdate, WAConnection, MessageType } from "@adiwajshing/baileys";
+import { WAOpenResult, WAChatUpdate, WAConnection } from "@adiwajshing/baileys";
+import Languages from "../../lang/help";
 import Connections from "../../routers/connections/connect";
 import { LogLogin } from "../../functions/function";
 import { HandlerData, CommandHandler, ClientMessage } from ".";
@@ -33,14 +34,16 @@ export class MainHandler extends Connections {
 		return void this.CallHandler.callDetector()
 	}
 	private GetMessages (): void {
-		this.client.on("chat-update", async (chats: WAChatUpdate) => {
-			const data: HandlingData | undefined =  this.HandlingData.getRespon(chats, this.client)
-			if (!data) return
+		this.client.on("chat-update", async (chats: WAChatUpdate): Promise <void> => {
+			const data: HandlingData | undefined =  this.HandlingData.getRespon(chats, this.client);
+			globalThis.Lang = new Languages(data?.prefix);
+			if (!data) return;
 			if (!Public && !data.isOwner) return;
-			globalThis.Client = new CommandHandler()
+			globalThis.Client = new CommandHandler();
 			const Cli: ClientMessage = new ClientMessage(this.client, data);
-			(await import("../../src/main")).onPattern()
-			return void (Client.waitEventsUpdate(this.client, data, Cli))
+			(await import("../../src/main")).onPattern();
+			Client.getEventsDetector(this.client, data, Cli)
+			return void (Client.waitEventsUpdate(this.client, data, Cli));
 		})
 	}
 	private CheckConneksi (): void {
