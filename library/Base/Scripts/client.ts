@@ -1,10 +1,11 @@
-import { WAConnection, MessageType, proto, WAGroupParticipant, compressImage } from '@adiwajshing/baileys'
+import { WAConnection, MessageType, proto, WAGroupParticipant, compressImage, WAGroupModification, GroupSettingChange } from '@adiwajshing/baileys'
 import {  HandlingData,  Formatter  } from "../../typings";
 import filetype, { FileTypeResult } from "file-type";
 import { RandomName, getUrl, getBuffer } from "../../functions/function";
 import { response } from "../../plugins";
 import * as fs from "fs";
 import { Headers } from "got";
+import util from "util";
 
 export class ClientMessage {
 	constructor (public client: WAConnection, public data: HandlingData) {}
@@ -115,6 +116,77 @@ export class ClientMessage {
 			return await this.client.sendMessage(from, media, MessageType.audio, { caption: _settings?.caption, quoted: _settings?.quoted,  contextInfo: { mentionedJid: Mentioned } })
 		} else {
 			return this.reply(from, "Media Not Support")
+		}
+	}
+	public  sendPanic = async (err: any): Promise <proto.WebMessageInfo> => {
+		return await this.client.sendMessage(this.data.sendOwner, "Error Fitur " + this.data.command + " :\n\n" + util.format(err), MessageType.extendedText)
+	}
+	public Panic = async (err: any): Promise <proto.WebMessageInfo> => {
+		return await this.client.sendMessage(this.data.from, util.format(new Error(util.format(err))), MessageType.extendedText)
+	}
+	public Add = async (respon: string | string[], target?: string | string[]): Promise <WAGroupModification> => {
+		if (target) {
+			return await this.client.groupAdd(respon as string, Array.isArray(target) ? target :  new Array(target.endsWith("@s.whatsapp.net") ? target : target + "@s.whatsapp.net"))
+		} else {
+			return await this.client.groupAdd(this.data.from, Array.isArray(respon) ? respon : new Array(respon.endsWith("@s.whatsapp.net") ? respon : respon + "@s.whatsapp.net"))
+		}
+	}
+	public Kick = async  (respon: string | string[], target?: string | string[]): Promise <WAGroupModification> => {
+		if (target) {
+			return await this.client.groupRemove(respon as string, Array.isArray(target) ? target :  new Array(target.endsWith("@s.whatsapp.net") ? target : target + "@s.whatsapp.net"))
+		} else {
+			return await this.client.groupRemove(this.data.from, Array.isArray(respon) ? respon : new Array(respon.endsWith("@s.whatsapp.net") ? respon : respon + "@s.whatsapp.net"))
+		}
+	}
+	public Promote = async  (respon: string | string[], target?: string | string[]): Promise <WAGroupModification> => {
+		if (target) {
+			return await this.client.groupMakeAdmin(respon as string, Array.isArray(target) ? target : new Array(target.endsWith("@s.whatsapp.net") ? target : target + "@s.whatsapp.net"))
+		} else {
+			return await this.client.groupMakeAdmin(this.data.from, Array.isArray(respon) ? respon :  new Array(respon.endsWith("@s.whatsapp.net") ? respon : respon + "@s.whatsapp.net"))
+		}
+	}
+	public Demote =  async  (respon: string | string[], target?: string | string[]): Promise <WAGroupModification> => {
+		if (target) {
+			return await this.client.groupDemoteAdmin(respon as string, Array.isArray(target) ? target :  new Array(target.endsWith("@s.whatsapp.net") ? target : target + "@s.whatsapp.net"))
+		} else {
+			return await this.client.groupDemoteAdmin(this.data.from, Array.isArray(respon) ? respon : new Array(respon.endsWith("@s.whatsapp.net") ? respon : respon + "@s.whatsapp.net"))
+		}
+	}
+	public setNameGroup = async (respon: string, title?: string): Promise <WAGroupModification> => {
+		if (!this.data.isGroupMsg) return await this.Panic("Bukan dalam Group")
+		if (title) {
+			return await this.client.groupUpdateSubject(respon, title)
+		} else {
+			return await this.client.groupUpdateSubject(this.data.from, respon)
+		}
+	}
+	public setDeskGroup = async (respon: string, desk?: string): Promise <WAGroupModification> => {
+		if (!this.data.isGroupMsg) return await this.Panic("Bukan dalam Group")
+		if (desk) {
+			return await this.client.groupUpdateDescription(respon, desk)
+		} else {
+			return await this.client.groupUpdateDescription(this.data.from, respon)
+		}
+	}
+	public group = async (respon: string | "open" | "close" | "buka" | "tutup", action?: "open" | "close" | "buka" | "tutup") => {
+		if (action) {
+			switch (action) {
+				case "open":
+				case "buka":
+				return await this.client.groupSettingChange(respon as string, GroupSettingChange.messageSend, false);
+				case "close":
+				case "tutup":
+				return await this.client.groupSettingChange(respon as string, GroupSettingChange.messageSend, true);
+			}
+		} else {
+			switch (respon) {
+				case "open":
+				case "buka":
+				return await this.client.groupSettingChange(this.data.from, GroupSettingChange.messageSend, false);
+				case "close":
+				case "tutup":
+				return await this.client.groupSettingChange(this.data.from, GroupSettingChange.messageSend, true);
+			}
 		}
 	}
 	public async sendFile (from: string, media: Buffer | string | proto.WebMessageInfo, _settings?: { caption?: string, quoted?: proto.WebMessageInfo, ptt?: boolean, viewOnce?: boolean, withMentions?: boolean, forwardingScore?: number, filename?: string, sendDocs?: boolean, autoPreview?: proto.ExternalAdReplyInfo }): Promise <proto.WebMessageInfo | void> {
