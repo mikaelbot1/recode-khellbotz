@@ -66,7 +66,7 @@ export var play: void = globalThis.Client.on("play", async (data: HandlingData, 
 			return void Cli.reply(from, "*「❗」* Mohon maaf kak hasil pencarian youtube anda error / kosong harap ganti media lain", id)
 		})
 	})
-}, { event: ["play mp4 <judul/url>", "play mp3 <judul/url>", "play <judul/url>"], command: ["play"], tag: "musik" })
+}, { event: ["play mp4 <judul/url>", "play mp3 <judul/url>", "play <judul/url>"], command: ["play"], tag: "musik",  isQuerry: true })
 
 export var ytmp4: void = globalThis.Client.on("ytmp4", async (data: HandlingData, Cli: ClientMessage) => {
 	const { from, id, createAPI, args } = data;
