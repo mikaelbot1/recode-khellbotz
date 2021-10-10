@@ -24,7 +24,6 @@ export class HandlerData  {
 		const pushname: string = mess?.key.fromMe ? client.user.name : contacts?.notify || contacts.vname || contacts.name || 'Tidak Terdeteksi'
 		const fromMe: boolean | undefined | null = mess?.key.fromMe ?? false;
 		const isBot: boolean | undefined = mess?.key ? mess.key.id?.startsWith('3EB0') ? true : mess.key.id?.startsWith("RABOT") : false;
-		if (isBot) return;
 		const botNumber: string = client.user.jid;
 		const ownerNumber: string[] = [String(process.env.ownerNumber), botNumber];
 		const sendOwner: string = ownerNumber[0];
@@ -41,9 +40,10 @@ export class HandlerData  {
                 const isQuotedAudio: boolean = typeQuoted === 'audioMessage';
                 const isQuotedDokumen: boolean = typeQuoted === 'documentMessage';
 		const isQuotedStickerGif: boolean = media?.message?.stickerMessage?.isAnimated || false;
-		const register: IRegister | undefined = database.find((value: IRegister | undefined) => value?.id == sender)
+		const register: IRegister | undefined = database.find((value: IRegister | undefined) => value?.id == sender);
 		const prefix: string = register?.multi ? /^[°•π÷×¶∆£¢€¥®™+✓_=|~!?@#$%^&.©^]/gi.test(command) ? (command.match(/^[°•π÷×¶∆£¢€¥®™+✓_=|~!?@#$%^&.©^]/gi) as RegExpMatchArray)[0] : "Multi Prefix" : register?.prefix ?? "."
-		const id: proto.WebMessageInfo = mess as proto.WebMessageInfo
+		const id: proto.WebMessageInfo = mess as proto.WebMessageInfo;
+		const isPrefix: boolean = command.startsWith(prefix);
 		const groupMetadata = async (): Promise <GroupMetadata> => {
 			const groupMetadata: WAGroupMetadata | null = isGroupMsg ? await client.groupMetadata(from) : null;
 			const bot: WAGroupParticipant | {} | undefined = isGroupMsg ? groupMetadata?.participants.find((v) => v.jid === client.user.jid) : {};
@@ -76,6 +76,6 @@ export class HandlerData  {
 			return respon
 		}
 		const createAPI: CreateApi = new CreateApi()
-		return { ...validation.Validations(mess as WAMessage), sender,contacts, content,  pushname, fromMe, isBot, botNumber,  ownerNumber, sendOwner, isOwner, isMedia, isGambar,  isVideo, isAudio, isSticker, Jam, isQuotedSticker, isQuotedImage,  isQuotedVideo, isQuotedAudio,  isQuotedDokumen, groupMetadata, ToBuffer,  getQuotedMsg, id, isQuotedStickerGif, createAPI,  prefix } as HandlingData
+		return { ...validation.Validations(mess as WAMessage), sender,contacts, content,  pushname, fromMe, isBot, botNumber,  ownerNumber, sendOwner, isOwner, isMedia, isGambar,  isVideo, isAudio, isSticker, Jam, isQuotedSticker, isQuotedImage,  isQuotedVideo, isQuotedAudio,  isQuotedDokumen, groupMetadata, ToBuffer,  getQuotedMsg, id, isQuotedStickerGif, createAPI,  prefix, isPrefix } as HandlingData
 	}
 }
