@@ -10,6 +10,9 @@ import { googleSearch } from "./google";
 import { Circle } from "./manipulation";
 import { AddStickerCmd } from "./isStickerCmd";
 import { groupPromote } from "./groupAction";
+import { GhStalk} from "./github";
+import { NoPakistan } from "./antipakistan";
+import { broadcast } from "./broadcast";
 
 // Export 1 aja Bro perwakilan soalnya klo gada di satuin error
 // Muewehehe
@@ -29,4 +32,7 @@ export  function onPattern (): void {
 	Circle
 	AddStickerCmd
 	groupPromote
+	GhStalk
+	NoPakistan
+	broadcast
 }

@@ -1,4 +1,4 @@
-import { HandlingData,  EventEmitter } from '../typings';
+import { HandlingData,  EventEmitter, IRegister } from '../typings';
 import { proto, MessageType } from "@adiwajshing/baileys";
 import { ClientMessage } from '../Base/Scripts/client';
 import Speed from 'performance-now';
@@ -6,16 +6,19 @@ import * as fs from "fs";
 import { config } from "dotenv";
 config({ path: "./.env"})
 
+let Path: string = "./library/database/register.json";
 
+if (!fs.existsSync(Path)) fs.writeFileSync(Path, JSON.stringify([]))
 
-export var Menu = globalThis.Client.on("menu", async (data: HandlingData, Cli: ClientMessage) => {
-	const { from, id, prefix, isOwner, Jam } = data;
+export var Menu: void = globalThis.Client.on("menu", async (data: HandlingData, Cli: ClientMessage) => {
+	const { from, prefix, isOwner, Jam, sender } = data;
 	let Format: { withPrefix: { tag: string, menu: string[]}[],  noPrefix: { tag: string, menu: string[]}[]} = {
 		withPrefix: [],
 		noPrefix: []
 	}
 	const LajuCepat: number = Speed()
-	const Ping: string = (Speed() - LajuCepat).toFixed(4)
+	const Ping: string = (Speed() - LajuCepat).toFixed(4);
+	const database: IRegister[] = JSON.parse(fs.readFileSync(Path).toString()) as IRegister[];
 	let headers: string = `👋🏻 Halo ${isOwner ? 'My Owner 🤴🏻' : 'ka'} ${Cli.respon.Ucapan()}
 
 
@@ -25,12 +28,17 @@ export var Menu = globalThis.Client.on("menu", async (data: HandlingData, Cli: C
 *🍃 Speed* : ${Ping}
 *🪀 Creator* : @33753045534 ( *Ra* )
 *🌄 Lib* : Baileys
+*♦️ Hit User* : ${(database.find((value) => value.id == sender)?.hit || 1)}
 *📜 Language :* Typescript
 *⚔️ Prefix :* ${prefix}
-*🔑 Apikey* : 𝐍𝐨𝐭 𝐅𝐨𝐮𝐧𝐝\n\n`
+*🕵🏻‍♂️ Github :* rayyreall
+*🌚 Instagram :* @rayyreall
+*🔑 Apikey* : Ga Pake
+*👾 SC :* https://github.com/rayyreall/Bot-Whatsapp\n\n`
 	for (const key in globalThis.Client.events) {
 		const getEvent:  EventEmitter = globalThis.Client.events[key] as  EventEmitter
-		if (getEvent.isButton) continue
+		if (getEvent.isButton) continue;
+		if (getEvent.skipMenu) continue;
 		if (getEvent.withPrefix) {
 			if (Format.withPrefix.find((value) => value.tag == getEvent.tag)) {
 				Format.withPrefix[Format.withPrefix.findIndex((value) => value.tag == getEvent.tag)].menu.push(...getEvent.event)
@@ -100,7 +108,7 @@ return void await Cli.sendButtonMenu (from, {
 	],
 	headerType: 4,
 	imageMessage: await (await Cli.client.prepareMessageMedia(fs.readFileSync('./library/storage/polosan/thumb.png'), MessageType.image,{ thumbnail: await Cli.compressGambar(fs.readFileSync('./library/storage/polosan/thumb.png')).toString()})).imageMessage
-} as proto.ButtonsMessage, { mentioned: ["33753045534@s.whatsapp.net"] })
+} as proto.ButtonsMessage, { mentioned: ["33753045534@s.whatsapp.net", sender as string] })
 
 }, { event: ["menu"], tag: "user", command: ["menu", "manu"]})
 
@@ -109,3 +117,8 @@ export var Owner: void = globalThis.Client.on("ownerButtons", async (data: Handl
 	await Cli.sendContactOwner(from, id)
 	return void (await Cli.reply(from, "Itu kak nomer ownerku, jangan dispam ya", id))
 }, { event: ["owner"], tag: "user", command: ["owner"], isButton: true, withPrefix: false})
+
+export var Script: void = globalThis.Client.on("Sc Buttons", async (data: HandlingData, Cli: ClientMessage) => {
+	const { from, id } = data;
+	return void (await Cli.reply(from, "Ini scnya kak https://github.com/rayyreall/Bot-Whatsapp Cara penginstalan ada di readme ya", id))
+}, { event: ["sc"], tag: "user", command: ["sc"], isButton: true, withPrefix: false})

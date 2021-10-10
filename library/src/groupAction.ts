@@ -16,7 +16,7 @@ export var groupDemote: void = globalThis.Client.on("Group Demote", async (data:
 	if (groupMeta.ownerGroup == mentioned[0]) return void await Cli.reply(from, "*「❗」*  Mohon maaf kak, kakak tidak dapat menurunka jabatan owner group", id)
 	if (!groupMeta.groupAdmins.find((value) => value === mentioned[0])) return void await Cli.reply(from, "*「❗」* Mohon maaf kak, kamu hanya dapat menurunkan jabatan admin group saja", id)
 	return void (await Cli.Demote(mentioned as string[]).then(() => Cli.sendTextWithMentions(from, `*✅* Berhasil menurunkan jabatan @${(mentioned as string[]).map((tag) => tag.replace('@s.whatsapp.net', '')).join(" , @")} menjadi member`, id)))
-},  { event: ["demote <mentioned>"], tag: "groups admin", command: ["demote"], isGroupMsg: true, isAdmins: true, isBotAdmins: true, isMentioned: true })
+},  { event: ["demote <mentioned>"], tag: "group admins", command: ["demote"], isGroupMsg: true, isAdmins: true, isBotAdmins: true, isMentioned: true })
 
 export var groupActions: void = globalThis.Client.on("Group OC", async (data: HandlingData, Cli: ClientMessage) => {
 	const { from, args, id, groupMetadata } = data;
@@ -25,17 +25,17 @@ export var groupActions: void = globalThis.Client.on("Group OC", async (data: Ha
 	const metadata: GroupMetadata = await groupMetadata()
 	let text: string = `*✅* Berhasil ${(test === "buka") ? "Membuka" : "Menutup"} group  ${metadata.groupMetadata?.subject}, Sekarang semua member ${(test === "buka") ? "dapat" : "tidak dapat"}  mengirimkan pesan`
 	return void ((await Cli.group(from, test)) && await Cli.reply (from, text, id))
-}, { event: ["group <open/close>"], tag: "groups admin", command: ["group", "groups"],  isGroupMsg: true, isAdmins: true, isBotAdmins: true })
+}, { event: ["group <open/close>"], tag: "group admins", command: ["group", "groups"],  isGroupMsg: true, isAdmins: true, isBotAdmins: true })
 
 export var setNameGc: void = globalThis.Client.on("setname group", async (data: HandlingData, Cli: ClientMessage) => {
 	const { from, id, args, groupMetadata } = data;
 	return void await Cli.setNameGroup(args.join(" ")).then(async () => Cli.reply(from, `*✅*  Berhasil mengubah deskripsi group ${(await groupMetadata()).groupMetadata?.subject}`, id))
-}, { event: ["setnamegc <nama>"], tag: "groups admin", command: ["setnamegc", "setnamagroup", "setnamagc", "setnamegroup"], isGroupMsg: true, isAdmins: true, isBotAdmins: true, isQuerry: true, limitText: 27 })
+}, { event: ["setnamegc <nama>"], tag: "group admins", command: ["setnamegc", "setnamagroup", "setnamagc", "setnamegroup"], isGroupMsg: true, isAdmins: true, isBotAdmins: true, isQuerry: true, limitText: 27 })
 
 export var setDeskGc: void = globalThis.Client.on("setdesk group", async (data: HandlingData, Cli: ClientMessage) => {
 	const { from, id, args, groupMetadata } = data;
 	return void await Cli.setDeskGroup(args.join(" ")).then(async () => Cli.reply(from, "*✅*  Berhasil mengubah deskripsi group " + (await groupMetadata()).groupMetadata?.subject, id))
-}, { event: ["setdesc <deskripsi>"], tag: "groups admin", command: ["setdesc", "setdesk"], isGroupMsg: true, isAdmins: true, isBotAdmins: true, isQuerry: true, limitText: 27 })
+}, { event: ["setdesc <deskripsi>"], tag: "group admins", command: ["setdesc", "setdesk"], isGroupMsg: true, isAdmins: true, isBotAdmins: true, isQuerry: true, limitText: 27 })
 
 export var setProfileGroup: void = globalThis.Client.on("setppgc", async (data: HandlingData, Cli: ClientMessage) => {
 	const { from, id, media, isGambar, isQuotedImage, isQuotedSticker } = data;
@@ -59,4 +59,4 @@ export var setProfileGroup: void = globalThis.Client.on("setppgc", async (data: 
 	} else {
 		return void await Cli.reply(from, "*「❗」*  Mohon maaf kak, harap reply gambar/ sticker untuk mengganti foto profile group", id)
 	}
-}, { event: ["setppgc <image/sticker>"], tag: "groups admin", command: ["setppgc", "setppgroup", "setppgrup"],  isGroupMsg: true, isAdmins: true, isBotAdmins: true, isMedia: true })
+}, { event: ["setppgc <image/sticker>"], tag: "group admins", command: ["setppgc", "setppgroup", "setppgrup"],  isGroupMsg: true, isAdmins: true, isBotAdmins: true, isMedia: true })

@@ -54,6 +54,36 @@ export var Sticker: void = globalThis.Client.on("sticker", async (data: Handling
 	
 }, { event: ["sticker <media>"], tag: "converter", command: ["s", "sticker", "stiker", "stickergif", "stikergif", "sgif"], isMedia: true, loading: false, withImghelpers: "https://bit.ly/39026d3", helpers: globalThis.Lang.HelpSticker() })
 
+export var sticker2: void = globalThis.Client.on("Sticker2", async (data: HandlingData, Cli: ClientMessage) => {
+	const { from, id, media, args, isGambar, isQuotedImage, isVideo, isQuotedVideo, isQuotedSticker, createAPI } = data;
+	var { OpenWaSticker } = createAPI;
+	let getWm1: string | undefined =  /\|/gi.test(args.join(" ")) ? args.join(" ").split("|")[0] : undefined;
+	let getWm2: string | undefined =  /\|/gi.test(args.join(" ")) ? args.join(" ").split("|")[1] : undefined;
+	if (isGambar || isQuotedImage || isVideo || isQuotedVideo) {
+		await Cli.wait()
+		return void await OpenWaSticker((await Cli.decryptMedia(media as proto.WebMessageInfo)), { author: getWm2, pack: getWm1, keepScale: true }).then(async (value) => {
+			return void await Cli.sendFile(from, value, { quoted: id });
+		}).catch(() =>  Cli.reply(from, "*「❗」* Gagal membuat sticker harap coba lagi lain waktu", id))
+	} else {
+		return void await Cli.reply(from, "*「❗」*  Maaf kak Harap Kirim/Reply Gambar/Video yang ingin di ubah menjadi sticker", id)
+	}
+}, { event: ["sticker2 <media>"], tag: "converter", command: ["s2", "sticker2", "stiker2", "stickergif2", "stikergif2", "sgif2"], isMedia: true })
+
+export var Stickernocrop: void = globalThis.Client.on("sticker no crop", async (data: HandlingData, Cli: ClientMessage) => {
+	const { from, id, media, args, isGambar, isQuotedImage, isVideo, isQuotedVideo, isQuotedSticker, createAPI } = data;
+	var { OpenWaSticker } = createAPI;
+	let getWm1: string | undefined =  /\|/gi.test(args.join(" ")) ? args.join(" ").split("|")[0] : undefined;
+	let getWm2: string | undefined =  /\|/gi.test(args.join(" ")) ? args.join(" ").split("|")[1] : undefined;
+	if (isGambar || isQuotedImage || isVideo || isQuotedVideo) {
+		await Cli.wait()
+		return void await OpenWaSticker((await Cli.decryptMedia(media as proto.WebMessageInfo)), { author: getWm2, pack: getWm1, keepScale: false }).then(async (value) => {
+			return void await Cli.sendFile(from, value, { quoted: id });
+		}).catch(() =>  Cli.reply(from, "*「❗」* Gagal membuat sticker harap coba lagi lain waktu", id))
+	} else {
+		return void await Cli.reply(from, "*「❗」*  Maaf kak Harap Kirim/Reply Gambar/Video yang ingin di ubah menjadi sticker", id)
+	}
+}, { event: ["stickernocrop <media>"], tag: "converter", command: ["stickernocrop", "stikernocrop","snocrop"], isMedia: true})
+
 export var Triggereder: void = globalThis.Client.on("triggered", async function (data: HandlingData, Cli: ClientMessage) {
 	const { from, id, media, isGambar, isQuotedImage, isQuotedSticker, isQuotedStickerGif } = data;
 	if (isGambar || isQuotedImage) {
