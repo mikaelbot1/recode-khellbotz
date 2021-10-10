@@ -8,7 +8,7 @@ export var groupPromote: void = globalThis.Client.on("Group Promote", async (dat
 	const { from, id, mentioned, groupMetadata } = data;
 	if ((await groupMetadata()).groupMember?.filter((value) => value.isAdmin).map((values) => values.jid).find((value) => value === mentioned[0])) return void await Cli.reply(from, "*「❗」* Mohon maaf kak, member tersebut admin kamu tidak dapat menaikkan jabatan member tersebut", id)
 	return void (await Cli.Promote(mentioned as string[]).then(() => Cli.sendTextWithMentions(from, `*✅* Berhasil menaikkan jabatan @${(mentioned as string[]).map((tag) => tag.replace('@s.whatsapp.net', '')).join(" , @")} menjadi admin`, id)))
-}, { event: ["promote <mentioned>"], tag: "groups admin", command: ["promote"], isGroupMsg: true, isAdmins: true, isBotAdmins: true, isMentioned: true })
+}, { event: ["promote <mentioned>"], tag: "group admins", command: ["promote"], isGroupMsg: true, isAdmins: true, isBotAdmins: true, isMentioned: true })
 
 export var groupDemote: void = globalThis.Client.on("Group Demote", async (data: HandlingData, Cli: ClientMessage) => {
 	const { from, id, mentioned, groupMetadata } = data;
