@@ -1,11 +1,14 @@
+import Github from "./github";
 import axios, { AxiosResponse } from "axios";
 import { UserAgent } from "../../functions/function";
 import * as fs from "fs";
 import cheerio, { CheerioAPI } from "cheerio";
-import { LirikResult } from "../../typings"
+import { LirikResult } from "../../typings";
 
-export default class LirikLagu {
-	constructor () {};
+export default class LirikLagu extends Github {
+	constructor () {
+		super()
+	};
 	public MusicMatch = async (judul: string): Promise <LirikResult|null> => {
 		return new Promise (async (resolve, reject) => {
 			try {

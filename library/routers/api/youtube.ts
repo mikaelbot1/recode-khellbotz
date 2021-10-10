@@ -1,5 +1,5 @@
 import Tiktok from "./tiktok";
-import ytSearch, { SearchResult, VideoSearchResult, VideoMetadataResult } from 'yt-search';
+import ytSearch, { SearchResult, VideoSearchResult, VideoMetadataResult, ChannelSearchResult } from 'yt-search';
 import  ytdl, { videoInfo, videoFormat } from 'ytdl-core';
 import { YoutubeDlCore, IKeepYoutube, Formatter, IY1tS, IYtSFormat, ISnappea, IY2Mate, IFormatterY2Mate, IFormatterY2MatePost, YoutubePlay  } from "../../typings";
 import axios, { AxiosResponse } from "axios";
@@ -26,6 +26,14 @@ export default class Youtube extends Tiktok {
 				return resolve(values.videos)
 			}).catch((err: Error) => {
 				return reject(err)
+			})
+		})
+	}
+	public YoutubeStalk = async (channel: string): Promise <ChannelSearchResult> => {
+		return new Promise (async (resolve, reject) => {
+			ytSearch(channel, (err, call) => {
+				if (err) return reject(err);
+				return resolve(call.channels[0] as ChannelSearchResult)
 			})
 		})
 	}
