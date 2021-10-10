@@ -9,3 +9,5 @@ export * from "./joox";
 export * from "./brainly";
 export * from "./lirik";
 export * from "./detector";
+export * from "./github";
+export * from "./openwasti";

@@ -31,6 +31,7 @@ export declare class HandlingData extends Validator {
 	isQuotedStickerGif: boolean;
 	createAPI: CreateApi;
 	prefix: string;
+	isPrefix: boolean;
 }
 export declare class Validator {
 	message: proto.IFutureProofMessage;

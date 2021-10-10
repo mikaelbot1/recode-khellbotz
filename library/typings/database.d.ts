@@ -15,3 +15,15 @@ export declare interface ICmdSticker {
 	id: string;
 	command: string;
 }
+
+export declare interface IConfiguration {
+	public: boolean;
+	antipakistan: boolean
+}
+
+export declare class IAwayFromKeyboard {
+	id: string;
+	from: string; 
+	alasan: string; 
+	time: number;
+}
