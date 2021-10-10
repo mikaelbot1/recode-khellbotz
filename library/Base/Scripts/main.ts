@@ -5,16 +5,20 @@ import { LogLogin } from "../../functions/function";
 import { HandlerData, CommandHandler, ClientMessage } from ".";
 import Call from "./CallHandling";
 import chalk from "chalk";
-import { HandlingData } from "../../typings";
+import * as fs from "fs";
+import { HandlingData, IConfiguration } from "../../typings";
 
-export let Public: boolean = false;
+let Path: string = "./library/database/config.json";
+
+if (!fs.existsSync(Path)) fs.writeFileSync(Path, JSON.stringify({ 
+	"public": false,
+	"antipakistan": false
+} as IConfiguration))
+
+export let Public: IConfiguration =  (JSON.parse(fs.readFileSync(Path).toString()) as IConfiguration);
 
 export function SettingsPublic (settings: boolean) {
-	if (settings) {
-		Public = true;
-	} else {
-		Public = false;
-	}
+	Public.public = settings;
 }
 
 export class MainHandler extends Connections {
@@ -38,11 +42,12 @@ export class MainHandler extends Connections {
 			const data: HandlingData | undefined =  this.HandlingData.getRespon(chats, this.client);
 			globalThis.Lang = new Languages(data?.prefix);
 			if (!data) return;
-			if (!Public && !data.isOwner) return;
+			if (!Public.public && !data.isOwner) return;
 			globalThis.Client = new CommandHandler();
 			const Cli: ClientMessage = new ClientMessage(this.client, data);
 			(await import("../../src/main")).onPattern();
 			Client.getEventsDetector(this.client, data, Cli)
+			if (data.isBot) return;
 			return void (Client.waitEventsUpdate(this.client, data, Cli));
 		})
 	}
