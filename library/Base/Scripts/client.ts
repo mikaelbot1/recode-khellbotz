@@ -27,7 +27,7 @@ export class ClientMessage {
 	}
 	public respon: Formatter = response as Formatter
 	public async sendTextWithMentions (from: string, text: string, id?: proto.WebMessageInfo): Promise <proto.WebMessageInfo> {
-		const ParseMentioned: string[] | undefined = (String(text).match(/@(0|[0-9]{4,14})/g)?.map((values: string) => values.split("@")[1] + "@s.whatsapp.net")) ?? []
+		const ParseMentioned: string[] | undefined = (String(text).match(/@(0|[0-9]{4,16})/g)?.map((values: string) => values.split("@")[1] + "@s.whatsapp.net")) ?? []
 		const Reparse: string[] | undefined = (await (await this.data.groupMetadata()).groupMember)?.map((values: WAGroupParticipant) => values.jid) ?? []
 		let Mentioned: string[] = [];
 		if (ParseMentioned) {
@@ -37,7 +37,7 @@ export class ClientMessage {
 				})
 			}
 		}
-		return await this.client.sendMessage(from, text, MessageType.extendedText, { quoted: id, contextInfo: { mentionedJid: Mentioned }})
+		return await this.client.sendMessage(from, text, MessageType.extendedText, { quoted: id, contextInfo: { mentionedJid: Mentioned }, waitForAck: true })
 	}
 	public async sendButtonMenu (from: string, buttons: proto.ButtonsMessage, settings?: { quoted?: proto.WebMessageInfo, mentioned?: string[]}) {
 		let response: proto.WebMessageInfo | any = await this.client.prepareMessage(from, buttons, MessageType.buttonsMessage, { thumbnail: await compressImage(fs.readFileSync('./library/storage/polosan/thumb.png')).toString(), quoted: settings?.quoted, contextInfo: { mentionedJid: settings?.mentioned}})
@@ -71,7 +71,7 @@ export class ClientMessage {
 	}
 	public Type = MessageType;
 	public async sendVideo (from: string, media: Buffer | string, _settings?: { caption?: string, quoted?: proto.WebMessageInfo, viewOnce?: boolean, withMentions?: boolean, constumHeaders?: Headers }): Promise <proto.WebMessageInfo> {
-		const ParseMentioned: string[] | undefined = _settings?.withMentions == true ? (String(_settings?.caption).match(/@(0|[0-9]{4,14})/g)?.map((values: string) => values.split("@")[1] + "@s.whatsapp.net")) : []
+		const ParseMentioned: string[] | undefined = _settings?.withMentions == true ? (String(_settings?.caption).match(/@(0|[0-9]{4,16})/g)?.map((values: string) => values.split("@")[1] + "@s.whatsapp.net")) : []
 		const Reparse: string[] | undefined = _settings?.withMentions == true ? (await (await this.data.groupMetadata()).groupMember)?.map((values: WAGroupParticipant) => values.jid) : []
 		let Mentioned: string[] = [];
 		if (ParseMentioned) {
@@ -95,7 +95,7 @@ export class ClientMessage {
 		}
 	}
 	public async sendAudio (from: string, media: Buffer | string, _settings?: { caption?: string, quoted?: proto.WebMessageInfo, withMentions?: boolean, costumHeaders?: Headers }): Promise <proto.WebMessageInfo> {
-		const ParseMentioned: string[] | undefined = _settings?.withMentions == true ? (String(_settings?.caption).match(/@(0|[0-9]{4,14})/g)?.map((values: string) => values.split("@")[1] + "@s.whatsapp.net")) : []
+		const ParseMentioned: string[] | undefined = _settings?.withMentions == true ? (String(_settings?.caption).match(/@(0|[0-9]{4,16})/g)?.map((values: string) => values.split("@")[1] + "@s.whatsapp.net")) : []
 		const Reparse: string[] | undefined = _settings?.withMentions == true ? (await (await this.data.groupMetadata()).groupMember)?.map((values: WAGroupParticipant) => values.jid) : []
 		let Mentioned: string[] = [];
 		if (ParseMentioned) {
@@ -122,7 +122,7 @@ export class ClientMessage {
 		return await this.client.sendMessage(this.data.sendOwner, "Error Fitur " + this.data.command + " :\n\n" + util.format(err), MessageType.extendedText)
 	}
 	public Panic = async (err: any): Promise <proto.WebMessageInfo> => {
-		return await this.client.sendMessage(this.data.from, util.format(new Error(util.format(err))), MessageType.extendedText)
+		return await this.client.sendMessage(this.data.from, util.format(err), MessageType.extendedText, { quoted: this.data.id })
 	}
 	public Add = async (respon: string | string[], target?: string | string[]): Promise <WAGroupModification> => {
 		if (target) {
@@ -190,7 +190,7 @@ export class ClientMessage {
 		}
 	}
 	public async sendFile (from: string, media: Buffer | string | proto.WebMessageInfo, _settings?: { caption?: string, quoted?: proto.WebMessageInfo, ptt?: boolean, viewOnce?: boolean, withMentions?: boolean, forwardingScore?: number, filename?: string, sendDocs?: boolean, autoPreview?: proto.ExternalAdReplyInfo }): Promise <proto.WebMessageInfo | void> {
-		const ParseMentioned: string[] | undefined = _settings?.withMentions == true ? (String(_settings?.caption).match(/@(0|[0-9]{4,14})/g)?.map((values: string) => values.split("@")[1] + "@s.whatsapp.net")) : []
+		const ParseMentioned: string[] | undefined = _settings?.withMentions == true ? (String(_settings?.caption).match(/@(0|[0-9]{4,16})/g)?.map((values: string) => values.split("@")[1] + "@s.whatsapp.net")) : []
 		const Reparse: string[] | undefined = _settings?.withMentions == true ? (await (await this.data.groupMetadata()).groupMember)?.map((values: WAGroupParticipant) => values.jid) : []
 		let Mentioned: string[] = [];
 		if (ParseMentioned) {
