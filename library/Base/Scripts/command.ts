@@ -42,7 +42,7 @@ export class CommandHandler {
 			..._event
 		}
 	}
-	public open (className: string, callback: (data: HandlingData, res: ClientMessage, event: EventsEmit ) => void, _event: EventCommand = {}) {
+	public open (className: string, callback: (data: HandlingData, res: ClientMessage, event: EventsEmit ) => any, _event: EventCommand = {}) {
 		_event.enable = _event.enable ? _event.enable : true
 		if (!this.detector[className]) this.detector[className] = {
 			target: className,
@@ -61,12 +61,12 @@ export class CommandHandler {
 			this.res = res;
 			let { isOwner, isGroupMsg, groupMetadata, fromMe, Jam, sender, args, pushname } = data;
 			try {
-				for (const className in this.detector) {
+				Object.keys(this.detector).map(async (className) => {
 					const event: EventsEmit = this.detector[className];
-					if (!event.enable && !isOwner) continue;
-					if (event.isGroupMsg && !isGroupMsg) continue;
-					if (event.isGroupAdmins && (await groupMetadata()).isGroupAdmins) continue;
-					let hasil: boolean = false
+					if (!event.enable && !isOwner) return;
+					if (event.isGroupMsg && !isGroupMsg) return;
+					if (event.isGroupAdmins && (await groupMetadata()).isGroupAdmins) return;
+					let hasil: string | undefined;
 					try {
 						hasil = (await event.callback(data, res, event)) 
 					} catch (err) {
@@ -74,7 +74,7 @@ export class CommandHandler {
 					} finally {
 						if (hasil) console.log(chalk.keyword('red')('\x1b[1;31m~\x1b[1;37m>'), chalk.keyword('blue')(`[\x1b[1;32m${chalk.hex('#009940').bold('RECORD')}]`), chalk.red.bold('\x1b[1;31m=\x1b[1;37m>'),chalk.cyan('\x1bmSTATUS :\x1b'), chalk.hex('#fffb00')(fromMe ? 'SELF' : 'PUBLIK'), chalk.greenBright('[COMMAND]'), chalk.keyword('red')('\x1b[1;31m~\x1b[1;37m>'), chalk.blueBright(hasil), chalk.hex('#f7ef07')(`[${args?.length}]`),chalk.red.bold('\x1b[1;31m=\x1b[1;37m>'), chalk.hex('#26d126')('[PENGIRIM]'),chalk.hex('#f505c1')(pushname), chalk.hex('#ffffff')(`(${sender?.replace(/@s.whatsapp.net/i, '')})`), chalk.greenBright('IN'), chalk.hex('#0428c9')(`${(await groupMetadata()).groupMetadata?.subject}`), chalk.keyword('red')('\x1b[1;31m~\x1b[1;37m>'), chalk.hex('#f2ff03')('[DATE] =>'),chalk.greenBright(Jam.split(' GMT')[0]))
 					}
-				}
+				})
 			} catch (err) {
 				return void console.log(err)
 			} 
@@ -116,7 +116,7 @@ export class CommandHandler {
 					if (event.antispam && !isOwner && !!doubleSpam.has(sender as string)) return;
 					if (event.antispam && !isOwner && !!rejectSpam.has(sender as string)) return;
 					if (event.antispam && !isOwner && !!waitSpam.has(sender as string)) return rejectSpam.add(sender as string) && await this.res.reply(from, `*「❗」* Mohon maaf kak, Tunggu perintah sebelumnya berakhir terlebih dahulu jika kakak ingin menggunakan perintah berikutnya`, id)
-					if (event.antispam && !isOwner && !!antispam.has(sender as string)) return doubleSpam.add(sender as string) && await this.res.reply(from, `*「❗」* Maaf ka setelah anda menggunakan command ada jeda ${event.delaySpam ?? 7000} detik untuk anda bisa menggunakan command kembali`, id)
+					if (event.antispam && !isOwner && !!antispam.has(sender as string)) return doubleSpam.add(sender as string) && await this.res.reply(from, `*「❗」* Maaf ka setelah anda menggunakan command ada jeda ${String(event.delaySpam).split("000")[0] ?? 7} detik untuk anda bisa menggunakan command kembali`, id)
 					if (event.withImghelpers && event.helpers && /^(?:-|--)help(?:s|)$/i.test(args[0])) return await this.res.sendFile(from, event.withImghelpers, { caption: event.helpers, quoted: id })
 					if (event.helpers && /^(?:-|--)help(?:s|)$/.test(args[0])) return this.res.reply(from,event.helpers, id)
 					if (event.isQuerry && event.isQuerryWithReply && !args[0] && !bodyQuoted) return  this.res.reply(from, "*「❗」* Mohon maaf kak, harap kirim pesan dengan querry atau kakak juga bisa reply pesan menggunakan caption untuk menggunakan perintah tersebut", id)
@@ -140,6 +140,7 @@ export class CommandHandler {
 						if (event.antispam && !!waitSpam.has(sender as string)) waitSpam.delete(sender as string)
 						if (event.antispam && !!antispam.has(sender as string)) antispam.delete(sender as string)
 						if (event.antispam && !!doubleSpam.has(sender as string)) doubleSpam.delete(sender as string)
+						if (/not expecting a response/gi.test(String(err))) return;
 						console.log(err)
 						this.res.reply(from, "*「❗」* Mohon Maaf kak, Saat ini Fitur sedang Error Bot otomatis menghubungi owner", id)
 						throw this.res.sendText(data.sendOwner, "Error " + _command + ":" + err)
