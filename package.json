@@ -1,7 +1,7 @@
 {
   "name": "whatsapp-bot",
   "version": "1.0.3",
-  "description": "Whatsapp Bot by RA BOT",
+  "description": "Whatsapp Bot by khell BOT",
   "main": "index.ts",
   "scripts": {
     "test": "ts-node ./library/test/index.ts",
